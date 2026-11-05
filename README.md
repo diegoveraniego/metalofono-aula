@@ -138,3 +138,7 @@ Las secciones usan tonos suaves coordinados con la interfaz: salvia, azul grisá
 ## Etiquetas adaptables (v1.4.1)
 
 Los bloques muestran «Compás 1–5» por defecto y cambian a «cc. 1–5» solo cuando el texto completo no cabe. La barra HTML mide el texto con la fuente real y recalcula al redimensionar los bloques; el canvas del video aplica el mismo criterio según el ancho disponible. Una sección de un solo compás muestra «Compás 6». Recarga con Ctrl+Shift+R para actualizar la caché.
+
+## Restablecer velocidad (v1.4.2)
+
+El botón «↺ 100%» junto al deslizador restablece tanto el valor mostrado como la velocidad del reloj. Si está reproduciendo, continúa desde la posición musical actual sin repetir la cuenta previa; si está pausado, se mantiene pausado. El botón separado de bucle conserva su función de repetir compases. El restablecimiento de velocidad se desactiva durante la grabación y cuando hay audio externo, igual que el deslizador.

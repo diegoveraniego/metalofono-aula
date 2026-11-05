@@ -23,5 +23,6 @@ export class Scheduler{
  }
  pause(){this.generation++;if(this.playing)this.position=Math.max(0,this.current());this.playing=false;clearInterval(this.timer);this.audio.cancel();}
  seek(beat){const was=this.playing;this.pause();this.position=Math.max(0,Math.min(this.end,beat));if(was)this.play(false);}
+ async setSpeed(value){const was=this.playing;this.pause();this.speed=Math.max(.25,Math.min(1.5,Number(value)||1));if(was)await this.play(false);}
  refresh(){const was=this.playing;this.pause();if(was)this.play(false);}
 }
