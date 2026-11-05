@@ -162,3 +162,11 @@ Se retiró la opción de tema oscuro y sus estilos, también del canvas y del vi
 ## Publicación estática sin consulta de metadatos
 
 El flujo de Pages sube directamente `dist/` y despliega el artefacto. No usa `actions/configure-pages`, porque no necesita reconfigurar un generador ni consultar su URL base. El sitio debe habilitarse previamente en Settings → Pages → GitHub Actions. El trabajo de despliegue declara `contents: read`, `pages: write` e `id-token: write`. No requiere tokens personales guardados como secretos.
+
+## Metalófono claro y volumen independiente (v1.7)
+
+El tutorial usa por defecto un sonido claro con fundamental calculada desde MIDI, La4 = 440 Hz, decaimiento de 0,8 segundos y un tercer armónico suave. «Sonido, apariencia y anticipación → Sonido del metalófono» permite volver a las campanas originales de Compás. El resto del acompañamiento sigue usando sus muestras de Compás. Esto no cambia las notas del archivo, la elección escrita/sonora ni la transposición.
+
+Se comprobó el espectro de las muestras originales que cubren MIDI 55–79: la fundamental está aproximadamente a +0,9 cents del temperamento estándar, pero sus parciales inarmónicos dominantes están por encima de esa fundamental (hasta 5,5 dB en la muestra más grave). Por tanto, esta medición no demuestra una desafinación de semitonos: el cambio de timbre/octava requiere confirmación perceptual en navegador. La alternativa clara deja una referencia de altura inequívoca sin alterar las demás pistas.
+
+El volumen del metalófono está disponible en el transporte, incluso en pantalla limpia, en el panel de audio y en su fila del mezclador. Los tres controles se sincronizan, permiten 0–200% y modifican el bus inmediatamente, también para notas que ya suenan. La amplificación se aplica igualmente a la captura de video; el limitador general puede comprimir mezclas fuertes. Recarga con Ctrl+Shift+R y comprueba v1.7.
