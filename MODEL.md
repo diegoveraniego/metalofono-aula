@@ -22,3 +22,7 @@
 ## Estructura detectada y progreso v1.2
 
 `Score.structureMarks?: {name,startMeasure}[]` recoge las marcas de ensayo `rehearsal`, deduplicadas por compás y ordenadas. Se convierten en secciones inclusivas para la carga inicial si no existe autoguardado. `progress.js` produce segmentos con `start` y `end` en negras desde cero, usando las duraciones reales de compás; incluye huecos. El progreso es `(beat-start)/(end-start)` limitado a 0–1. Los límites de una sección no dependen del BPM ni de la cantidad nominal de pulsos por compás. La estructura exportada por Compás (`sections[].start/end`) se convierte a este modelo al importar JSON.
+
+## Sonido muestreado v1.5
+
+`SamplePlayer` adapta `CompasSampler` al reloj y a los buses existentes. Usa el mismo banco embebido de 52 WAV que `Compas.html`; la caché de buffers es por AudioContext. `Track.program` y `Track.drum` seleccionan la familia, con prioridad de nombres igual al sampler original. El tutorial fuerza `sound:'bells'` y toca la altura transformada de la lámina. Las otras partes tocan altura sonora original. Las fuentes muestreadas entran en `audio.voices`, por lo que pausa/salto/bucle las cancelan igual que las pistas externas. Los grupos de apagado de percusión se limpian al cancelar.

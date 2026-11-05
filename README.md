@@ -54,12 +54,12 @@ Primero se definió el modelo documentado en [MODEL.md](MODEL.md). El MVP corres
 | `scheduler.js` | Reloj Web Audio, mapas de tempo, reproducción, pausa y bucles |
 | `renderer.js` | Canvas, 25 láminas, baquetas, cascada, pulso y línea de secciones |
 | `accompaniment.js` | Mezclador, familias instrumentales, percusión y pistas de audio locales |
-| `metronome.js` | Síntesis sinusoidal y armónico, clic acentuado y buses de audio |
+| `metronome.js` | Timbre muestreado del metalófono, clic acentuado y buses de audio |
 | `structure.js` | Validación JSON, autoguardado y descarga |
 | `exporter.js` | Captura audiovisual, códecs y descarga |
 | `app.js` | Controles, accesibilidad de interfaz y coordinación |
 
-Se usa Canvas para que la exportación incluya exactamente instrumento, baquetas, título y estructura. No se usan imágenes, fuentes externas ni samples: la síntesis evita licencias y descargas adicionales. Los parsers son propios y MIT; no dependen de `fflate` o `@tonejs/midi` porque el entorno de construcción no permitía descargarlos. El ZIP usa `DecompressionStream('deflate-raw')` del navegador, admite métodos ZIP almacenado y deflate, y limita tamaño expandido a 32 MB. Un navegador antiguo puede necesitar `.musicxml`. No se ejecutan scripts ni se interpretan etiquetas HTML del archivo importado.
+Se usa Canvas para que la exportación incluya exactamente instrumento, baquetas, título y estructura. No se usan imágenes ni fuentes externas. Desde v1.5 se distribuyen localmente los mismos samples y sampler de Compás, con sus avisos de licencia en `dist/licenses/`; el metrónomo conserva síntesis simple. Los parsers son propios y MIT; no dependen de `fflate` o `@tonejs/midi` porque el entorno de construcción no permitía descargarlos. El ZIP usa `DecompressionStream('deflate-raw')` del navegador, admite métodos ZIP almacenado y deflate, y limita tamaño expandido a 32 MB. Un navegador antiguo puede necesitar `.musicxml`. No se ejecutan scripts ni se interpretan etiquetas HTML del archivo importado.
 
 ### Alcance de importación
 
@@ -142,3 +142,13 @@ Los bloques muestran «Compás 1–5» por defecto y cambian a «cc. 1–5» sol
 ## Restablecer velocidad (v1.4.2)
 
 El botón «↺ 100%» junto al deslizador restablece tanto el valor mostrado como la velocidad del reloj. Si está reproduciendo, continúa desde la posición musical actual sin repetir la cuenta previa; si está pausado, se mantiene pausado. El botón separado de bucle conserva su función de repetir compases. El restablecimiento de velocidad se desactiva durante la grabación y cuando hay audio externo, igual que el deslizador.
+
+## Timbres de Compás (v1.5)
+
+Se reutilizan **exactamente** el banco `samples.js` y el motor `sampler.js` integrados en `Compas.html`, copiados a `dist/vendor/compas-samples.js` y `compas-sampler.js`. Contienen 52 WAV mono PCM y siete familias: campanas (metalófono), guitarra acústica, guitarra eléctrica limpia, bajo eléctrico, teclado/sintetizador, coro/guía de voz y batería acústica GM. Los dos teclados comparten la familia de Compás; la voz es un coro sin letra. Se conserva el mapeo por región, afinación, bucles de sustain, envolventes y apagado entre hi-hats. La mezcla general puede diferir según volúmenes y limitador.
+
+`sample-player.js` conecta ese reproductor a los buses y al reloj existentes de Metalófono Aula, para que tanto el tutorial como las otras partes y el video usen estas muestras. Los WAV/MP3 cargados por el docente siguen sustituyendo a su pista. Solo el metrónomo utiliza osciladores. No se descarga ningún recurso de un tercero: el banco está incluido en la aplicación y su caché offline. La primera carga incorpora aproximadamente 10,7 MB de JavaScript con las muestras; se decodifican una sola vez por contexto de audio.
+
+Muestras melódicas: MS Basic / MuseScore General (MIT; avisos completos en `dist/licenses/MS-Basic-MIT.md`). Batería: Big Rusty Drums, Karoryfer (CC0; `dist/licenses/Big-Rusty-Drums-CC0.txt`). El código original del proyecto sigue bajo MIT.
+
+Verificación: 22 pruebas automáticas, incluyendo decodificación y amplitud de las 52 muestras, selección de las nueve partes, cinco sonidos distintos de batería, conexión al mezclador, exclusión de la melodía y sustitución por audio externo. La regresión local de Everybody verifica una región disponible para cada altura sonora. La escucha perceptual y el video requieren navegador normal; el entorno de desarrollo mantiene la limitación ya indicada. Recarga con Ctrl+Shift+R y comprueba v1.5.
