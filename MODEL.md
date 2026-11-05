@@ -30,3 +30,7 @@
 ## Campanas con fundamental definida v1.7.1
 
 Cuando `sampler.soundFor(track)==='bells'`, el adaptador conecta la muestra a dos BiquadFilter lowpass, Q=1/√2, con corte `min(0.45*sampleRate, 2*440*2**((midi-69)/12))`. No cambia la tasa de reproducción ni el MIDI. Atenúa el parcial dominante inarmónico que, en la muestra grave de Compás, se percibía casi cinco semitonos por encima descontando octavas. Las fuentes y sus filtros se limpian juntos al finalizar. Las demás familias conservan el sampler original sin ese filtrado.
+
+## Altura visual y sonora v1.8
+
+`transformed()` conserva `soundMidi = source.midi + 12*octave + semitones`, además de `midi` calculado según la elección escrita/sonora para las láminas. `AudioEngine.tutorialPitch` elige `score` (por defecto: reproducir `soundMidi`) o `instrument` (reproducir `midi`). En Everybody, nota fuente sonora 97/escrita 73 se visualiza en 73 y se reproduce en 97. Las muestras de campanas solo se filtran si el adaptador recibe `emphasizeFundamental:true`, utilizado en el modo de sonido de lámina escolar. En modo partitura se conserva el timbre y la región originales de Compás. Los clics sobre las láminas aplican la misma transposición escrita→sonora de la parte.

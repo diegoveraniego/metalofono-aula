@@ -180,3 +180,13 @@ El adaptador ahora pasa las campanas por dos filtros lowpass Q=1/√2, con corte
 `python3 scripts/debug-bell-pitch.py` (requiere numpy y scipy solo para este diagnóstico) compara el espectro de las 25 láminas antes y después de esos mismos filtros. Tras filtrar, el pico dominante coincide con la fundamental en las 25 notas, con error medido menor a un cent. Para las notas concretas: Do♯5 pasa de un pico dominante de 2942,068 Hz a 554,656 Hz; Si4 de 2621,084 Hz a 494,143 Hz. La pequeña desviación de aproximadamente +0,9 cents procede de la muestra original, no equivale a un semitono. La prueba de regresión del MXL verifica MIDI 73 y 71 en el compás 6. La página `/diagnostico.html` permite escuchar esas dos campanas corregidas sin acompañamiento. Hay 24 pruebas automáticas de Node; la escucha real sigue requiriendo un navegador normal.
 
 Recarga con Ctrl+Shift+R tras publicar y comprueba v1.7.1. El volumen independiente 0–200% de v1.7 se mantiene.
+
+## Misma altura sonora que Compás (v1.8)
+
+La comparación con el `Compas.html` del proyecto de referencia muestra una diferencia decisiva: sus primeros ataques de glockenspiel son MIDI **97 y 95**, respetando la transposición +24 del MXL. Metalófono Aula mostraba correctamente MIDI **73 y 71**, pero también enviaba esos valores al sampler. Por ello elegía `bells/72.wav`, cuyo parcial dominante se percibía como Fa♯/Mi. Compás elige `bells/96.wav` para esas dos notas, donde la fundamental domina. La revisión anterior de los parciales describía el problema de la muestra grave, pero faltaba comparar esta diferencia en la altura sonora.
+
+El modelo ahora separa `midi` (lámina que se ilumina) y `soundMidi` (altura sonora original más los ajustes docentes). Por defecto el tutorial usa el timbre original de Compás y la opción «Altura del sonido: Como la partitura»: en Everybody se iluminan Do♯5 y Si4 y suena el glockenspiel dos octavas más arriba, igual que Compás. Esto conserva la clase de nota, sin convertir Sol en Do ni Do♯ en Fa♯.
+
+«Como la lámina escolar» permite que el sonido coincida con el MIDI rotulado de cada lámina; en ese modo se define la fundamental de las campanas con los filtros de v1.7.1. En el modo predeterminado, el sampler reproduce las muestras originales sin ese filtrado. El sonido claro sigue disponible. Tanto los ataques de la partitura como los clics sobre las láminas respetan esta elección.
+
+Verificación: 25 pruebas automáticas, regresión de Everybody con los pares visual/sonoro `[73,97]` y `[71,95]`, y comprobación de que se selecciona `bells/96.wav`, como en Compás. En `/diagnostico.html` se puede escuchar la secuencia aislada. El volumen independiente 0–200% se mantiene. Recarga con Ctrl+Shift+R tras publicar y comprueba v1.8.
