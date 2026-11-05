@@ -130,3 +130,7 @@ El repositorio incluye `.github/workflows/pages.yml`: comprueba los módulos y e
 Para activar la publicación en un repositorio público de GitHub: **Settings → Pages → Build and deployment → Source → GitHub Actions**. Después ejecuta el flujo «Comprobar y publicar GitHub Pages» desde Actions, o sube un cambio a `main`. La dirección real se muestra en el resultado del trabajo `deploy` y en Settings → Pages. No se requiere dominio propio ni servidor de aplicación.
 
 Consulta la [configuración oficial de GitHub Pages con Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Una vez publicado, cualquier docente puede cargar sus archivos localmente; las partituras y audios no se envían a GitHub.
+
+## Paleta de estructura (v1.4)
+
+Las secciones usan tonos suaves coordinados con la interfaz: salvia, azul grisáceo, verde, lavanda, arena y ocre. Se distinguen de los colores más saturados de las láminas; cada bloque conserva nombre, rango de compases y resaltado activo. La misma paleta aparece en la barra HTML y en el video. Al cargar estructuras guardadas o importadas, los seis colores predeterminados intensos de versiones anteriores se actualizan cuando corresponden al tipo de sección; los colores personalizados se conservan. Recarga con Ctrl+Shift+R y comprueba v1.4 en el pie.
