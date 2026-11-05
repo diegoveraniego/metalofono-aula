@@ -158,3 +158,7 @@ Verificación: 22 pruebas automáticas, incluyendo decodificación y amplitud de
 Paleta suave corregida para todas las octavas: Do azul, Re verde, Mi amarillo, Fa naranjo, Sol rojo, La morado y Si celeste. Las cinco alturas alteradas (sostenidos/bemoles) usan un mismo azul más claro que Do y distinto del celeste de Si. La cascada usa los mismos colores. En el editor, modificar una alteración actualiza las cinco para conservar ese criterio. El esquema monocromo sigue disponible.
 
 Se retiró la opción de tema oscuro y sus estilos, también del canvas y del video. Las preferencias oscuras antiguas ya no se leen. Para que una paleta guardada anterior no anule esta corrección, los nuevos colores se guardan con una nueva clave de paleta; la primera carga de v1.6 aplica estos valores. Recarga con Ctrl+Shift+R y comprueba v1.6.
+
+## Publicación estática sin consulta de metadatos
+
+El flujo de Pages sube directamente `dist/` y despliega el artefacto. No usa `actions/configure-pages`, porque no necesita reconfigurar un generador ni consultar su URL base. El sitio debe habilitarse previamente en Settings → Pages → GitHub Actions. El trabajo de despliegue declara `contents: read`, `pages: write` e `id-token: write`. No requiere tokens personales guardados como secretos.
