@@ -1,5 +1,5 @@
 import {noteName,measureAt,clamp} from './model.js';
-import {structureSegments,segmentProgress,segmentAt,contrastColor} from './progress.js';
+import {structureSegments,segmentProgress,segmentAt,contrastColor,measureRangeLabel} from './progress.js';
 export const PALETTE=['#d66b63','#cf7b58','#dc9750','#c5a64c','#9daa56','#65a37c','#529e9d','#6399b8','#7988b8','#9981b4','#b57f9f','#c77b88'];
 function rr(ctx,x,y,w,h,r=8){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
 export class Renderer{
@@ -12,7 +12,7 @@ export class Renderer{
   const activeWidth=widths[segments.indexOf(active)]*scale,offset=Math.max(0,Math.min(total*scale-1470,activeLeft+activeWidth/2-735));
   c.save();c.beginPath();c.rect(65,755,1470,90);c.clip();let left=65-offset;
   segments.forEach((s,i)=>{const width=widths[i]*scale,right=left+width;if(right>=65&&left<=1535){c.fillStyle=s.color;rr(c,left+2,763,width-4,72,7);c.fill();const progress=segmentProgress(s,beat);c.fillStyle='rgba(0,0,0,.13)';rr(c,left+2,763,Math.max(0,(width-4)*progress),72,7);c.fill();if(s===active&&beat>=0){c.strokeStyle=ink;c.lineWidth=3;rr(c,left+3,764,width-6,70,7);c.stroke();}
-   c.save();c.beginPath();c.rect(left+12,769,width-24,60);c.clip();c.fillStyle=contrastColor(s.color);c.textAlign='left';c.font='600 20px system-ui';let label=s.name;while(label.length>1&&c.measureText(label).width>width-28)label=label.slice(0,-2)+'…';c.fillText(label,left+14,790);c.font='16px system-ui';c.fillText(`cc ${s.startMeasure}–${s.endMeasure}`,left+14,817);c.restore();this.timelineRegions.push({left:Math.max(65,left),right:Math.min(1535,right),segment:s});}left=right;});
+   c.save();c.beginPath();c.rect(left+12,769,width-24,60);c.clip();c.fillStyle=contrastColor(s.color);c.textAlign='left';c.font='600 20px system-ui';let label=s.name;while(label.length>1&&c.measureText(label).width>width-28)label=label.slice(0,-2)+'…';c.fillText(label,left+14,790);c.font='16px system-ui';c.fillText(measureRangeLabel(s.startMeasure,s.endMeasure,width-28,t=>c.measureText(t).width),left+14,817);c.restore();this.timelineRegions.push({left:Math.max(65,left),right:Math.min(1535,right),segment:s});}left=right;});
   const cursor=65+activeLeft-offset+segmentProgress(active,beat)*activeWidth;c.strokeStyle=dark?'#fff':'#11251c';c.lineWidth=3;c.beginPath();c.moveTo(cursor,756);c.lineTo(cursor,842);c.stroke();c.restore();
  }
  draw(beat,part,notes,structure,scheduler){const c=this.ctx,o=this.opts,dark=o.dark,bg=dark?'#202926':'#f8f7f2',ink=dark?'#f1f3e9':'#233d35',muted=dark?'#b3c1b8':'#728078';c.fillStyle=bg;c.fillRect(0,0,1600,900);c.textAlign='left';c.fillStyle=muted;c.font='600 17px system-ui';c.fillText('METALÓFONO / AULA',65,52);c.fillStyle=ink;c.font='600 31px system-ui';c.fillText(o.title.slice(0,65),65,98);if(o.teacher){c.fillStyle=muted;c.font='19px system-ui';c.fillText(o.teacher.slice(0,75),65,130);}

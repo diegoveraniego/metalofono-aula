@@ -8,3 +8,5 @@ export function structureSegments(part,sections){
 export function segmentProgress(segment,beat){return Math.max(0,Math.min(1,(beat-segment.start)/(segment.end-segment.start)));}
 export function segmentAt(segments,beat){if(beat<0)return segments[0];return segments.find(s=>beat>=s.start&&beat<s.end)??segments.at(-1);}
 export function contrastColor(hex){const rgb=hex.replace('#','').match(/../g).map(h=>parseInt(h,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722>.179?'#11251c':'#ffffff';}
+
+export function measureRangeLabel(start,end,availableWidth=Infinity,measureText=()=>0){const range=start===end?String(start):`${start}–${end}`;const full=`Compás ${range}`;return measureText(full)<=availableWidth?full:`cc. ${range}`;}

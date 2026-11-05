@@ -4,12 +4,16 @@ import {AudioEngine} from './metronome.js';
 import {Scheduler} from './scheduler.js';
 import {Renderer,PALETTE} from './renderer.js';
 import {Structure,download,sectionsFromMarks} from './structure.js';
-import {structureSegments,segmentProgress,segmentAt,contrastColor} from './progress.js';
+import {structureSegments,segmentProgress,segmentAt,contrastColor,measureRangeLabel} from './progress.js';
 import {Exporter} from './exporter.js';
 import {Accompaniment,backingEvents} from './accompaniment.js';
 const $=id=>document.getElementById(id), audio=new AudioEngine(),renderer=new Renderer($('stage')),exporter=new Exporter($('stage'),audio);
 const accompaniment=new Accompaniment(audio);
 let progressSegments=[],progressButtons=[],lastProgressId=null;
+const labelMeasureContext=document.createElement('canvas').getContext('2d');
+function fitProgressLabel(button){const label=button.querySelector('span');if(!label)return;labelMeasureContext.font=getComputedStyle(label).font;const text=measureRangeLabel(Number(label.dataset.start),Number(label.dataset.end),label.clientWidth,t=>labelMeasureContext.measureText(t).width);if(label.textContent!==text)label.textContent=text;}
+const progressResizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(entries=>entries.forEach(e=>fitProgressLabel(e.target))):null;
+window.addEventListener('resize',()=>progressButtons.forEach(fitProgressLabel));
 let noticeTimer,score,part,allNotes,notes,scoreKey='example-v1',recordBackup=null,importToken=0;
 function notify(message){$('notice').textContent=message;$('notice').hidden=false;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$('notice').hidden=true,9500);}
 const structure=new Structure(notify),scheduler=new Scheduler(audio,()=>{syncPlay();if(exporter.active)setTimeout(()=>exporter.stop(),950);});
@@ -51,15 +55,15 @@ $('backingOn').onchange=()=>{accompaniment.enabled=$('backingOn').checked;accomp
 
 function renderSections(){renderProgress();$('restoreMarks').disabled=!score.structureMarks?.length;$('sectionList').replaceChildren();if(!structure.sections.length){const p=document.createElement('p');p.className='hint';p.textContent='Aún no hay secciones. Agrega la primera abajo.';$('sectionList').append(p);}for(const s of structure.sections){const row=document.createElement('div');row.className='section-item';row.style.setProperty('--section',s.color);const go=document.createElement('button');go.type='button';go.className='section-go';const title=document.createElement('span');title.textContent=s.name;const info=document.createElement('small');info.textContent=`Compases ${s.startMeasure}–${s.endMeasure}`;go.append(title,info);go.onclick=()=>{scheduler.loop=null;$('loopToggle').setAttribute('aria-pressed','false');scheduler.seek(part.measures[s.startMeasure-1].start);syncPlay();};const loop=document.createElement('button');loop.textContent='↻ Bucle';loop.setAttribute('aria-label','Repetir '+s.name);loop.onclick=()=>{$('loopStart').value=s.startMeasure;$('loopEnd').value=s.endMeasure;setLoop(true);scheduler.seek(part.measures[s.startMeasure-1].start);};const edit=document.createElement('button');edit.textContent='✎';edit.setAttribute('aria-label','Editar '+s.name);edit.onclick=()=>{$('sectionName').value=s.name;$('sectionStart').value=s.startMeasure;$('sectionEnd').value=s.endMeasure;$('sectionColor').value=s.color;$('sectionForm').dataset.editId=s.id;$('sectionName').focus();};const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label','Eliminar '+s.name);del.onclick=()=>{structure.remove(s.id);renderSections();};row.append(go,loop,edit,del);$('sectionList').append(row);}}
 function renderProgress(){
- progressSegments=structureSegments(part,structure.sections);progressButtons=[];lastProgressId=null;
+ progressResizeObserver?.disconnect();progressSegments=structureSegments(part,structure.sections);progressButtons=[];lastProgressId=null;
  const track=$('sectionProgressTrack');track.style.setProperty('--track-min-width',`${progressSegments.length*170}px`);track.replaceChildren($('sectionCursor'));
- for(const segment of progressSegments){const button=document.createElement('button');button.type='button';button.className='section-progress-block';button.style.setProperty('--block-color',segment.color);button.style.setProperty('--block-ink',contrastColor(segment.color));button.style.flexGrow=String(segment.end-segment.start);button.setAttribute('aria-label',`${segment.name}, compases ${segment.startMeasure} a ${segment.endMeasure}. Saltar al inicio`);const title=document.createElement('strong');title.textContent=segment.name;const range=document.createElement('span');range.textContent=`cc ${segment.startMeasure}–${segment.endMeasure}`;button.append(title,range);button.onclick=()=>{if(exporter.active)return;scheduler.loop=null;$('loopToggle').setAttribute('aria-pressed','false');scheduler.seek(segment.start);syncPlay();updateProgress(scheduler.current());};track.append(button);progressButtons.push(button);}
+ for(const segment of progressSegments){const button=document.createElement('button');button.type='button';button.className='section-progress-block';button.style.setProperty('--block-color',segment.color);button.style.setProperty('--block-ink',contrastColor(segment.color));button.style.flexGrow=String(segment.end-segment.start);button.setAttribute('aria-label',`${segment.name}, compases ${segment.startMeasure} a ${segment.endMeasure}. Saltar al inicio`);const title=document.createElement('strong');title.textContent=segment.name;const range=document.createElement('span');range.dataset.start=segment.startMeasure;range.dataset.end=segment.endMeasure;range.textContent=measureRangeLabel(segment.startMeasure,segment.endMeasure);button.append(title,range);button.onclick=()=>{if(exporter.active)return;scheduler.loop=null;$('loopToggle').setAttribute('aria-pressed','false');scheduler.seek(segment.start);syncPlay();updateProgress(scheduler.current());};track.append(button);progressButtons.push(button);progressResizeObserver?.observe(button);fitProgressLabel(button);}
  updateProgress(scheduler.current());
 }
 function updateProgress(beat){
  const current=segmentAt(progressSegments,beat);if(!current)return;const active=progressSegments.indexOf(current),button=progressButtons[active];
  progressButtons.forEach((b,i)=>{b.classList.toggle('is-current',i===active&&beat>=0);b.classList.toggle('is-past',beat>=progressSegments[i].end);b.style.setProperty('--section-fill',`${segmentProgress(progressSegments[i],beat)*100}%`);if(i===active&&beat>=0)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');b.disabled=exporter.active;});
- $('progressSection').textContent=beat<0?'Cuenta previa':`${current.name} · cc ${current.startMeasure}–${current.endMeasure}`;
+ $('progressSection').textContent=beat<0?'Cuenta previa':`${current.name} · ${measureRangeLabel(current.startMeasure,current.endMeasure)}`;
  const x=button.offsetLeft+segmentProgress(current,beat)*button.offsetWidth;$('sectionCursor').style.transform=`translateX(${x}px)`;
  if(lastProgressId!==current.start){lastProgressId=current.start;if(scheduler.playing){const viewport=$('sectionProgressViewport');viewport.scrollTo({left:Math.max(0,button.offsetLeft-(viewport.clientWidth-button.offsetWidth)/2),behavior:'auto'});}}
 }
