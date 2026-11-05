@@ -26,3 +26,7 @@
 ## Sonido muestreado v1.5
 
 `SamplePlayer` adapta `CompasSampler` al reloj y a los buses existentes. Usa el mismo banco embebido de 52 WAV que `Compas.html`; la caché de buffers es por AudioContext. `Track.program` y `Track.drum` seleccionan la familia, con prioridad de nombres igual al sampler original. El tutorial fuerza `sound:'bells'` y toca la altura transformada de la lámina. Las otras partes tocan altura sonora original. Las fuentes muestreadas entran en `audio.voices`, por lo que pausa/salto/bucle las cancelan igual que las pistas externas. Los grupos de apagado de percusión se limpian al cancelar.
+
+## Campanas con fundamental definida v1.7.1
+
+Cuando `sampler.soundFor(track)==='bells'`, el adaptador conecta la muestra a dos BiquadFilter lowpass, Q=1/√2, con corte `min(0.45*sampleRate, 2*440*2**((midi-69)/12))`. No cambia la tasa de reproducción ni el MIDI. Atenúa el parcial dominante inarmónico que, en la muestra grave de Compás, se percibía casi cinco semitonos por encima descontando octavas. Las fuentes y sus filtros se limpian juntos al finalizar. Las demás familias conservan el sampler original sin ese filtrado.
