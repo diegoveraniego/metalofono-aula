@@ -1,0 +1,1 @@
+{"name":"metalofono-aula","version":"1.3.0","private":true,"type":"module","license":"MIT","scripts":{"start":"python3 -m http.server 8080 --directory dist","test":"node --test --test-isolation=none tests/*.test.js","check":"node scripts/check.mjs"}}
