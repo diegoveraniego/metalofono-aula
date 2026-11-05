@@ -21,11 +21,11 @@ export class Renderer{
  }
  drawPiano(beat,keys,notes,anticipation){
   const c=this.ctx,o=this.opts;c.fillStyle='#e2e2d7';rr(c,61,320,1478,334,13);c.fill();
-  for(const k of keys){const active=notes.some(n=>n.midi===k.midi&&beat>=n.start&&beat<n.start+n.duration);c.fillStyle=k.sharp?'#242b29':'#fffefa';c.shadowColor='rgba(24,44,34,.16)';c.shadowBlur=k.sharp?5:2;c.shadowOffsetY=k.sharp?4:2;rr(c,k.x,k.y,k.w,k.h,k.sharp?5:7);c.fill();c.shadowBlur=0;c.shadowOffsetY=0;c.strokeStyle='rgba(35,61,53,.17)';c.lineWidth=1;c.stroke();
-   if(active){c.fillStyle=k.sharp?'rgba(185,211,198,.25)':'rgba(130,172,150,.2)';rr(c,k.x+1,k.y+1,k.w-2,k.h-2,5);c.fill();c.strokeStyle=k.sharp?'#b9ccc0':'#5c8a73';c.lineWidth=3;c.stroke();}
-   c.fillStyle=k.sharp?'#f4f6f0':'#122d28';c.textAlign='center';c.font=`600 ${k.sharp?12:17}px system-ui`;c.fillText(noteName(k.midi,o.latin,o.middle),k.x+k.w/2,k.y+k.h-(k.sharp?17:22),k.w-6);
+  for(const k of keys){const active=notes.some(n=>n.midi===k.midi&&beat>=n.start&&beat<n.start+n.duration);c.fillStyle=active?(k.sharp?'#6bbbd9':'#9ed7eb'):(k.sharp?'#242b29':'#fffefa');c.shadowColor='rgba(24,44,34,.16)';c.shadowBlur=k.sharp?5:2;c.shadowOffsetY=k.sharp?4:2;rr(c,k.x,k.y,k.w,k.h,k.sharp?5:7);c.fill();c.shadowBlur=0;c.shadowOffsetY=0;c.strokeStyle='rgba(35,61,53,.17)';c.lineWidth=1;c.stroke();
+   if(active){c.strokeStyle='#3a8dac';c.lineWidth=3;rr(c,k.x+1,k.y+1,k.w-2,k.h-2,5);c.stroke();}
+   c.fillStyle=k.sharp&&!active?'#f4f6f0':'#122d28';c.textAlign='center';c.font=`600 ${k.sharp?12:17}px system-ui`;c.fillText(noteName(k.midi,o.latin,o.middle),k.x+k.w/2,k.y+k.h-(k.sharp?17:22),k.w-6);
   }
-  for(const n of notes){const delta=n.start-beat;if(delta>anticipation||delta<-.3)continue;const k=keys.find(k=>k.midi===n.midi);if(!k)continue;const progress=clamp(1-delta/Math.max(.01,anticipation),0,1),x=k.x+k.w/2,y=k.y+22-(1-progress)*110,fade=delta<0?clamp(1+delta/.3,0,1):.25+.75*progress;const color='#7a9e8b';
+  for(const n of notes){const delta=n.start-beat;if(delta>anticipation||delta<-.3)continue;const k=keys.find(k=>k.midi===n.midi);if(!k)continue;const progress=clamp(1-delta/Math.max(.01,anticipation),0,1),x=k.x+k.w/2,y=k.y+22-(1-progress)*110,fade=delta<0?clamp(1+delta/.3,0,1):.25+.75*progress;const color='#6bbbd9';
    c.save();c.globalAlpha=fade;const gradient=c.createLinearGradient(x,y-48,x,y);gradient.addColorStop(0,'rgba(255,255,255,0)');gradient.addColorStop(1,color);c.fillStyle=gradient;rr(c,x-5,y-48,10,48,5);c.fill();c.fillStyle='#fffefa';c.strokeStyle=color;c.lineWidth=3;c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();c.stroke();c.restore();
   }
  }

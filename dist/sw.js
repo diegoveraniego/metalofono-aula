@@ -1,4 +1,4 @@
-const CACHE='metalofono-aula-v13';
+const CACHE='metalofono-aula-v14';
 const FILES=['./','./index.html','./style.css','./diagnostico.html','./manifest.webmanifest','./icon.svg','./vendor/compas-samples.js','./vendor/compas-sampler.js','./licenses/MS-Basic-MIT.md','./licenses/Big-Rusty-Drums-CC0.txt','./js/sample-player.js','./js/accompaniment.js','./js/app.js','./js/instruments.js','./js/model.js','./js/parser.js','./js/metronome.js','./js/scheduler.js','./js/renderer.js','./js/progress.js','./js/structure.js','./js/exporter.js','./examples/himno.musicxml','./examples/himno.mid','./examples/himno.mxl'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('metalofono-aula-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
