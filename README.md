@@ -23,7 +23,7 @@ En un alojamiento estático HTTPS, la primera visita guarda la aplicación y los
 5. Reproduce. Cambia velocidad 25–150% sin cambiar tono. El BPM de la fuente y sus cambios se aplican de forma predeterminada. Editar BPM activa el reemplazo manual. Los BPM y la anticipación en pulsos están expresados en negras: en 6/8, cada clic es una corchea y un pulso de anticipación equivale a dos corcheas. El compás manual reagrupa los clics y sus acentos; la navegación conserva los compases originales del archivo.
 6. Configura cuenta previa de 0–4 compases, volúmenes independientes y silencio de melodía. Cambiar controles mientras suena replanifica el audio. Pausar durante la cuenta previa la reinicia al reproducir.
 7. Agrega secciones con nombre, límites inclusivos y color. No se permiten solapamientos. Los huecos muestran «Sin sección». Puedes editar (✎), borrar (×), saltar o repetir cada sección. La línea de tiempo del canvas también permite saltar. El JSON y el autoguardado se asocian a la huella de contenido de la partitura y a la parte seleccionada. Importar un JSON aplica sus secciones a la parte actual tras validar sus límites.
-8. Activa cascada, colores personalizados, tema oscuro o pantalla limpia. La paleta y el tema se conservan en el navegador. Los demás ajustes de reproducción se eligen para cada sesión.
+8. Activa cascada, colores personalizados o pantalla limpia. La paleta se conserva en el navegador. Los demás ajustes de reproducción se eligen para cada sesión.
 
 Atajos fuera de campos y botones: espacio reproduce/pausa, flechas izquierda/derecha saltan de compás, Escape sale de pantalla limpia. Se puede tocar una lámina con clic/toque para escuchar su afinación.
 
@@ -152,3 +152,9 @@ Se reutilizan **exactamente** el banco `samples.js` y el motor `sampler.js` inte
 Muestras melódicas: MS Basic / MuseScore General (MIT; avisos completos en `dist/licenses/MS-Basic-MIT.md`). Batería: Big Rusty Drums, Karoryfer (CC0; `dist/licenses/Big-Rusty-Drums-CC0.txt`). El código original del proyecto sigue bajo MIT.
 
 Verificación: 22 pruebas automáticas, incluyendo decodificación y amplitud de las 52 muestras, selección de las nueve partes, cinco sonidos distintos de batería, conexión al mezclador, exclusión de la melodía y sustitución por audio externo. La regresión local de Everybody verifica una región disponible para cada altura sonora. La escucha perceptual y el video requieren navegador normal; el entorno de desarrollo mantiene la limitación ya indicada. Recarga con Ctrl+Shift+R y comprueba v1.5.
+
+## Colores del instrumento y tema claro (v1.6)
+
+Paleta suave corregida para todas las octavas: Do azul, Re verde, Mi amarillo, Fa naranjo, Sol rojo, La morado y Si celeste. Las cinco alturas alteradas (sostenidos/bemoles) usan un mismo azul más claro que Do y distinto del celeste de Si. La cascada usa los mismos colores. En el editor, modificar una alteración actualiza las cinco para conservar ese criterio. El esquema monocromo sigue disponible.
+
+Se retiró la opción de tema oscuro y sus estilos, también del canvas y del video. Las preferencias oscuras antiguas ya no se leen. Para que una paleta guardada anterior no anule esta corrección, los nuevos colores se guardan con una nueva clave de paleta; la primera carga de v1.6 aplica estos valores. Recarga con Ctrl+Shift+R y comprueba v1.6.
