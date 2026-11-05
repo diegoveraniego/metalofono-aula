@@ -34,3 +34,9 @@ Cuando `sampler.soundFor(track)==='bells'`, el adaptador conecta la muestra a do
 ## Altura visual y sonora v1.8
 
 `transformed()` conserva `soundMidi = source.midi + 12*octave + semitones`, además de `midi` calculado según la elección escrita/sonora para las láminas. `AudioEngine.tutorialPitch` elige `score` (por defecto: reproducir `soundMidi`) o `instrument` (reproducir `midi`). En Everybody, nota fuente sonora 97/escrita 73 se visualiza en 73 y se reproduce en 97. Las muestras de campanas solo se filtran si el adaptador recibe `emphasizeFundamental:true`, utilizado en el modo de sonido de lámina escolar. En modo partitura se conserva el timbre y la región originales de Compás. Los clics sobre las láminas aplican la misma transposición escrita→sonora de la parte.
+
+## Piano v1.9
+
+`instruments.js` declara metalófono (span 24, 25 alturas, base 55) y piano (span 48, 49 alturas, base 36), detecta partes por nombre/programa y calcula la geometría de piano. `rangeCount` recibe un span opcional que conserva 24 como valor predeterminado para compatibilidad. `transformed(...,mode='all')` preserva todos los ataques y sus duraciones para piano.
+
+La altura visual `midi` y sonora `soundMidi` mantienen sus funciones. `AudioEngine.tutorialInstrument='piano'` selecciona el banco `keys` de Compás en vez de `bells`. Scheduler entrega la duración de cada nota en segundos al audio y reanuda sostenidos al saltar. Renderer usa los límites reales de duración para mantener teclas activas; las estelas indican ataques futuros y se desvanecen después, sin baquetas. La parte seleccionada se excluye del backing en ambas vistas. El rango y el modo se recuerdan por instrumento en memoria; la estructura sigue guardándose por partitura y parte.
