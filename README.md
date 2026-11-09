@@ -1,6 +1,26 @@
-# Metalófono Aula
+# adaptaciones / aula
 
-Aplicación libre (MIT), en español, para preparar tutoriales de metalófono de 25 láminas a partir de MusicXML/MXL o MIDI. HTML, CSS y módulos JavaScript sin backend, sin cuentas, sin analítica, sin CDN y sin dependencias de instalación. Todos los archivos y el procesamiento permanecen en el dispositivo.
+Aplicación libre (MIT) para adaptar partituras MusicXML/MXL o MIDI a visualizaciones de metalófono, piano, guitarra, bajo, batería y voz con letra sincronizada. Parte de un kit de herramientas de código abierto para docentes y estudiantes de música. HTML, CSS y módulos JavaScript sin backend, sin cuentas, sin analítica, sin CDN y sin dependencias de instalación. Todo el procesamiento permanece en el dispositivo.
+
+La pantalla principal muestra el player, la carga de partituras, pantalla completa y un selector de parte. Elige Voz, Guitarra eléctrica 1, Bajo u otra parte para activar automáticamente su visualización conservando la posición de reproducción. La configuración permite elegir manualmente otro tipo de instrumento. Pantalla completa usa la función del navegador cuando está disponible; si no, activa pantalla limpia. Esc o «Volver al player» permiten salir. La rueda de configuración reúne Partitura, Instrumento, Audio, Práctica y Video y ayuda. En Voz, «Mostrar nombres de notas» está desactivado por defecto y puede activarse en Configuración → Instrumento. La cuenta de entrada indica pulsos y su equivalencia en compases, respetando el compás de la partitura o el ajuste manual.
+
+Las visualizaciones son apoyos para interpretar; practicar lectura de notación convencional es un objetivo que el docente puede trabajar alternando la visualización con la partitura.
+
+En Bajo se leen las cuerdas, los trastes y la afinación del MXL, incluida su transposición sonora. Batería muestra carriles por elemento y conserva los golpes simultáneos. El mapa de pentagrama acordado para este material es Re4 = pedal hi-hat, Fa4 = bombo, La4 = tom de piso, Do5 = caja, Re5 = tom 2, Mi5 = tom 1, Fa5/La5 = crash y Sol5 = hi-hat (× cerrado, ⊗ abierto). Configuración → Instrumento permite escuchar cada asignación y cambiarla durante la sesión. En archivos con otras convenciones de pentagrama, revisa esas asignaciones antes de usar la visualización.
+
+En piano, la cascada y las teclas activas usan morado para la mano derecha (clave de Sol) y naranja para la mano izquierda (clave de Fa). La leyenda muestra dos íconos de mano en esos colores. El importador conserva el pentagrama y los cambios de clave del MXL; no deduce la clave por si una nota es grave o aguda. Los archivos MIDI o sin clave declarada usan un color neutro. Configuración → Instrumento → Sonido, apariencia y anticipación permite activar «Mostrar nombres en las notas que bajan», con los nombres y octavas que hayas elegido.
+
+En Configuración → Video y ayuda, «Grabar todas las partes» genera un video por parte durante una única reproducción. Cada video tiene su visualización, comparte la mezcla de audio actual y se entrega dentro de un ZIP. Las partes con el mismo nombre se numeran. La grabación requiere mantener la pestaña visible y sucede en tiempo real; no es exportación sin navegador. La resolución y el formato se eligen antes de grabar. El ZIP admite hasta 4 GB.
+
+Los elementos de batería tienen volumen 0–200% y silencio independientes en Configuración → Instrumento. Los ajustes se conservan durante la sesión y afectan tanto al tutorial como al acompañamiento sintetizado y a las grabaciones. Un audio externo ya mezclado conserva su mezcla y no se puede separar por elemento.
+
+Configuración → Instrumento → Instrucción inicial del video permite activar un texto editable por parte y elegir su duración (2–30 segundos). El texto sugerido para guitarra explica cómo alternar melodía y acordes. La pantalla se graba en silencio antes de la cuenta previa, sin avanzar la música. En una grabación múltiple, todas las partes usan la duración de preparación más larga para mantener sincronía; las partes sin texto activado muestran una pantalla de preparación. Las instrucciones se conservan durante la sesión.
+
+El botón de pincel abajo a la izquierda abre «Estilos del aula · Dev / testing». Permite probar Modus Operandi/Vivendi, Catppuccin Latte/Mocha, Nord, Gruvbox y Tokyo Night; cambiar tipografía, tamaño de texto de menús, bordes y refuerzo de contraste. La paleta del visualizador puede seguir la del menú o elegirse aparte. Las opciones se guardan localmente y pueden exportarse/importarse como JSON. El botón Restablecer vuelve al estilo Aula.
+
+«Aplicar también al visualizador y los videos» cambia los fondos, textos y bordes del canvas, incluidas las instrucciones iniciales y la grabación de todas las partes. Los colores de notas, láminas, manos, cuerdas, batería y secciones se adaptan al tema activo manteniendo su diferenciación. Las ediciones manuales de notas y secciones se guardan por tema dentro del preset. El panel de testing no se incluye en los videos y no permite cambios durante la grabación. El tamaño de texto del panel afecta solo a los menús, para conservar el diseño temporal de las visualizaciones.
+
+Las fuentes se resuelven en el equipo; si Comic Sans, Atkinson Hyperlegible u otra no está instalada, se usa una alternativa. También se puede cargar un archivo TTF/OTF/WOFF/WOFF2 local durante la sesión. No se incluyen archivos de fuentes en los presets JSON; para recuperar una fuente personalizada hay que cargarla de nuevo. Referencias de las paletas en `dist/licenses/appearance-palettes.md`.
 
 ## Abrir la aplicación
 

@@ -13,7 +13,7 @@ export class Scheduler{
   else for(const bar of this.part.measures){const u=4/bar.denominator;for(let b=bar.start;b<bar.start+bar.duration-1e-7;b+=u)if(b>=this.position-1e-7)this.clicks.push({beat:b,accent:Math.abs(b-bar.start)<1e-7});}
   this.nextBacking=this.backing.findIndex(n=>n.start>=this.position-1e-7);if(this.nextBacking<0)this.nextBacking=this.backing.length;
   for(const n of this.backing){if(n.start>=this.position)break;if(n.start+n.duration>this.position&&!n.drum){const at=this.anchorTime+this.seconds(this.anchorBeat,this.position);this.audio.accompany?.(n,Math.max(this.audio.ctx.currentTime,at),this.seconds(this.position,Math.min(n.start+n.duration,this.loop?.end??this.end)));}}
-  if(this.audio.tutorialInstrument==='piano')for(const n of this.notes){if(n.start>=this.position)break;if(n.start+n.duration>this.position){const at=this.anchorTime+this.seconds(this.anchorBeat,this.position);this.audio.note(n,Math.max(this.audio.ctx.currentTime,at),this.seconds(this.position,Math.min(n.start+n.duration,this.loop?.end??this.end)));}}
+  if(this.audio.tutorialInstrument!=='metalofono'&&this.audio.tutorialInstrument!=='bateria')for(const n of this.notes){if(n.start>=this.position)break;if(n.start+n.duration>this.position){const at=this.anchorTime+this.seconds(this.anchorBeat,this.position);this.audio.note(n,Math.max(this.audio.ctx.currentTime,at),this.seconds(this.position,Math.min(n.start+n.duration,this.loop?.end??this.end)));}}
   this.audio.startStems?.(this);this.clickIndex=0;this.timer=setInterval(()=>this.tick(),25);this.tick();
  }
  tick(){if(!this.playing)return;const now=this.audio.ctx.currentTime,limit=now+.12,end=this.loop?.end??this.end;

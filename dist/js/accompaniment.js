@@ -1,7 +1,8 @@
+import {drumNotes} from './drums.js';
 import {instrumentLabel} from './sample-player.js';
 // Acompañamiento: alturas sonoras originales, polifonía completa y audio local opcional.
 export function family(part){const p=part.program??0,n=part.name.toLowerCase();if(part.percussion)return 'drums';if(/bajo|bass/.test(n)||p>=32&&p<=39)return 'bass';if(/el[ée]ctrica/.test(n)||p>=26&&p<=31)return 'electric';if(/guitarra|guitar/.test(n)||p>=24&&p<=25)return 'guitar';if(/voz|voice|vocal/.test(n)||p>=52&&p<=54)return 'voice';if(/synth|sint|teclado/.test(n)||p>=80&&p<=103)return 'synth';return 'keys';}
-export function backingEvents(parts,selectedId){return parts.filter(p=>p.id!==selectedId).flatMap(p=>p.notes.map(n=>({...n,trackId:p.id,drum:p.percussion||n.drum}))).sort((a,b)=>a.start-b.start||a.midi-b.midi);}
+export function backingEvents(parts,selectedId,{drumMappings={},drumMix={}}={}){return parts.filter(p=>p.id!==selectedId).flatMap(p=>(p.percussion?drumNotes(p.notes,drumMappings[p.id],drumMix[p.id]):p.notes).map(n=>({...n,trackId:p.id,drum:p.percussion||n.drum}))).sort((a,b)=>a.start-b.start||a.midi-b.midi);}
 export class Accompaniment{
  constructor(audio){this.audio=audio;this.tracks=new Map();this.enabled=true;audio.accompany=(n,t,d)=>this.note(n,t,d);audio.startStems=s=>this.startStems(s);}
  load(parts){for(const t of this.tracks.values())t.bus?.disconnect();this.tracks=new Map(parts.map(p=>[p.id,{id:p.id,name:p.name,type:family(p),program:p.program??0,drum:!!p.percussion,label:instrumentLabel(p),volume:.45,muted:false,solo:false,buffer:null,fileName:'',bus:null}]));this.selected=null;}

@@ -1,6 +1,6 @@
 // Tonos de estructura suaves, separados de los colores de altura del instrumento.
 export const SECTION_COLORS=['#b9ccc0','#b7c7d6','#a4bbaa','#c6b8ce','#d6bb9b','#d3c79f'];
-function sectionFamily(name){const n=name.trim().toLowerCase();return /intro|outro|final/.test(n)?0:/pre[- ]?(verso|estrofa)/.test(n)?1:/solo/.test(n)?4:/estrofa|verso/.test(n)?2:/estribillo|coro/.test(n)?3:5;}
+export function sectionFamily(name){const n=name.trim().toLowerCase();return /intro|outro|final/.test(n)?0:/pre[- ]?(verso|estrofa)/.test(n)?1:/solo/.test(n)?4:/estrofa|verso/.test(n)?2:/estribillo|coro/.test(n)?3:5;}
 export function sectionColor(name){return SECTION_COLORS[sectionFamily(name)];}
 function migratePalette(sections){const legacy=['#c94343','#326ac7','#31805c','#9361b8','#b45d26','#ac7c24'];return sections.map(s=>s.color.toLowerCase()===legacy[sectionFamily(s.name)]?{...s,color:sectionColor(s.name)}:s);}
 export function sectionsFromMarks(marks,max){const unique=[...new Map((marks||[]).filter(m=>Number.isInteger(m.startMeasure)&&m.startMeasure>=1&&m.startMeasure<=max&&m.name?.trim()).map(m=>[m.startMeasure,m])).values()].sort((a,b)=>a.startMeasure-b.startMeasure);return unique.map((m,i)=>({id:'mark-'+m.startMeasure,name:m.name.trim(),startMeasure:m.startMeasure,endMeasure:unique[i+1]?unique[i+1].startMeasure-1:max,color:sectionColor(m.name)}));}

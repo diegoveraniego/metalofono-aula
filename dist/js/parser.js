@@ -31,6 +31,16 @@ const child=(el,name)=>Array.from(el.children).find(e=>e.localName===name);
 const children=(el,name)=>Array.from(el.children).filter(e=>e.localName===name);
 const val=(el,name,fallback='')=>child(el,name)?.textContent??fallback;
 const num=(el,name,fallback=0)=>Number(val(el,name,fallback));
+function readHarmony(el,start,measure){
+ const root=child(el,'root'),bass=child(el,'bass'),kind=child(el,'kind'),frame=child(el,'frame');
+ const accidental=n=>n===-2?'♭♭':n===-1?'♭':n===1?'♯':n===2?'𝄪':'';
+ const rootName=root?val(root,'root-step')+accidental(num(root,'root-alter')):'';
+ const suffixes={major:'',minor:'m',dominant:'7','major-seventh':'maj7','minor-seventh':'m7',diminished:'dim',augmented:'aug','half-diminished':'m7♭5','diminished-seventh':'dim7','major-sixth':'6','minor-sixth':'m6','dominant-ninth':'9','major-ninth':'maj9','minor-ninth':'m9','suspended-second':'sus2','suspended-fourth':'sus4',power:'5',none:''};
+ const type=kind?.textContent??'major',suffix=kind?.getAttribute('text')??suffixes[type]??type;
+ const degrees=children(el,'degree').map(d=>(val(d,'degree-type')==='subtract'?'omit':val(d,'degree-type')==='add'?'add':'')+accidental(num(d,'degree-alter'))+val(d,'degree-value')).join('');
+ const label=type==='none'?'N.C.':rootName+suffix+(degrees?'('+degrees+')':'')+(bass?'/'+val(bass,'bass-step')+accidental(num(bass,'bass-alter')):'');
+ return {start,measure,label,root:rootName,kind:type,frame:frame?{firstFret:num(frame,'first-fret',1),frets:num(frame,'frame-frets',4),strings:num(frame,'frame-strings',6),notes:children(frame,'frame-note').map(n=>({string:num(n,'string'),fret:num(n,'fret'),finger:val(n,'fingering'),barre:child(n,'barre')?.getAttribute('type')}))}:null};
+}
 function xmlDoc(source){const doc=new DOMParser().parseFromString(source,'application/xml');if(doc.querySelector('parsererror'))throw Error('MusicXML no válido.');return doc;}
 export function parseXML(source){
  const doc=xmlDoc(source),root=doc.documentElement;
@@ -40,8 +50,9 @@ export function parseXML(source){
  const parts=children(root,'part').map((part,pi)=>{
   const id=part.getAttribute('id')||'p'+pi,definition=definitions.get(id),instrument=definition&&child(definition,'midi-instrument');
   const drumMap=new Map(definition?children(definition,'midi-instrument').filter(i=>child(i,'midi-unpitched')).map(i=>[i.getAttribute('id'),num(i,'midi-unpitched')-1]):[]);
+  const drumInstruments=[...drumMap].map(([id,midi])=>({id,midi,xmlMidi:midi+1,name:children(definition,'score-instrument').find(i=>i.getAttribute('id')===id)?.querySelector('instrument-name')?.textContent??id}));
   const percussion=drumMap.size>0;const program=instrument?num(instrument,'midi-program',1)-1:0;
-  let divisions=1,beats=4,unit=4,start=0,transpose=0;const notes=[],measures=[],tempos=[],meters=[],ties=new Map();
+  let divisions=1,beats=4,unit=4,start=0,transpose=0,tuning=[];const notes=[],clefs=[],lyrics=[],harmonies=[],measures=[],tempos=[],meters=[],ties=new Map();
   children(part,'measure').forEach((measure,mi)=>{
    for(const mark of measure.getElementsByTagName('rehearsal'))if(mark.textContent.trim())structureMarks.push({name:mark.textContent.trim(),startMeasure:mi+1});
    let cursor=0,lastStart=0,extent=0;
@@ -51,27 +62,33 @@ export function parseXML(source){
      divisions=num(el,'divisions',divisions);if(divisions<=0)throw Error('Divisiones MusicXML inválidas.');
      const time=child(el,'time');if(time){beats=val(time,'beats','4').split('+').reduce((s,n)=>s+Number(n),0);unit=num(time,'beat-type',4);meters.push({start,numerator:beats,denominator:unit});}
      const tr=child(el,'transpose');if(tr)transpose=num(tr,'chromatic')+12*num(tr,'octave-change');
+     for(const clef of children(el,'clef'))clefs.push({start:start+cursor,staff:Number(clef.getAttribute('number')||1),sign:val(clef,'sign'),line:num(clef,'line'),octaveChange:num(clef,'clef-octave-change')});
+     const staff=children(el,'staff-details').find(s=>children(s,'staff-tuning').length);if(staff)tuning=children(staff,'staff-tuning').sort((a,b)=>Number(b.getAttribute('line'))-Number(a.getAttribute('line'))).map(t=>12*(num(t,'tuning-octave')+1)+({C:0,D:2,E:4,F:5,G:7,A:9,B:11}[val(t,'tuning-step')])+num(t,'tuning-alter'));
+
     }
     if(tag==='direction'){
      const sound=child(el,'sound'),met=el.querySelector('metronome');let bpm=sound?Number(sound.getAttribute('tempo')):0;
      if(!bpm&&met){const units={whole:4,half:2,quarter:1,eighth:.5,'16th':.25};bpm=num(met,'per-minute',120)*(units[val(met,'beat-unit','quarter')]||1)*(child(met,'beat-unit-dot')?1.5:1);}
      if(bpm>0)tempos.push({start:start+cursor+num(el,'offset')/divisions,bpm});
     }
+    if(tag==='harmony')harmonies.push(readHarmony(el,start+cursor+num(el,'offset')/divisions,mi+1));
     if(tag==='backup')cursor-=num(el,'duration')/divisions;
     if(tag==='forward'){cursor+=num(el,'duration')/divisions;extent=Math.max(extent,cursor);}
     if(tag==='note'){
      if(child(el,'grace')){warnings.push('Las notas de adorno se omiten.');continue;}
      const duration=num(el,'duration')/divisions,chord=!!child(el,'chord'),at=chord?lastStart:cursor,pitch=child(el,'pitch'),voice=val(el,'voice','1');
      if(pitch){
+      for(const l of children(el,'lyric')){const texts=children(l,'text').map(t=>t.textContent).join(' ');if(texts)lyrics.push({start:start+at,duration,text:texts,syllabic:val(l,'syllabic','single'),verse:l.getAttribute('number')||'1',extend:!!child(l,'extend'),lineBreakAfter:!!child(l,'end-line')});}
       const pc={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[val(pitch,'step')],alter=num(pitch,'alter'),midi=12*(num(pitch,'octave')+1)+pc+alter+transpose;
       if(!Number.isInteger(midi)||midi<0||midi>127)throw Error('Altura no compatible (microtonos o nota MIDI inválida).');
       const key=voice+':'+val(el,'staff','1')+':'+midi,types=children(el,'tie').map(t=>t.getAttribute('type'));
       const old=ties.get(key);
-      if(types.includes('stop')&&old&&Math.abs(old.start+old.duration-(start+at))<1e-5){old.duration+=duration;if(!types.includes('start'))ties.delete(key);}
-      else {const n={id:`p${pi}n${notes.length}`,midi,writtenMidi:midi-transpose,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,voice,velocity:.75};notes.push(n);if(types.includes('start'))ties.set(key,n);}
+      if(types.includes('stop')&&old&&Math.abs(old.start+old.duration-(start+at))<1e-5){old.duration+=duration;for(const l of lyrics){if(l.start<start+at&&Math.abs(l.start+l.duration-(start+at))<1e-5&&!lyrics.some(next=>next.verse===l.verse&&Math.abs(next.start-(start+at))<1e-5))l.duration+=duration;}if(!types.includes('start'))ties.delete(key);}
+      else {const n={id:`p${pi}n${notes.length}`,midi,writtenMidi:midi-transpose,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,staff:num(el,'staff',1),voice,velocity:.75};const technical=el.querySelector('technical');const slide=el.querySelector('slide');if(slide)n.slide=slide.getAttribute('type');if(technical){n.string=num(technical,'string');n.fret=num(technical,'fret',-1);}notes.push(n);if(types.includes('start'))ties.set(key,n);}
      }else if(child(el,'unpitched')){
       const drumId=child(el,'instrument')?.getAttribute('id'),midi=drumMap.get(drumId)??(drumMap.size===1?[...drumMap.values()][0]:null);
-      if(midi!==null)notes.push({id:`p${pi}n${notes.length}`,midi,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,voice,velocity:.65,drum:true});
+      const unpitched=child(el,'unpitched'),info=drumInstruments.find(i=>i.id===drumId);
+      if(midi!==null)notes.push({instrumentId:drumId,drumName:info?.name,displayStep:val(unpitched,'display-step'),displayOctave:num(unpitched,'display-octave'),notehead:val(el,'notehead','normal'),id:`p${pi}n${notes.length}`,midi,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,voice,velocity:.65,drum:true});
       else warnings.push('Se omitió percusión sin asignación MIDI.');
      }
      if(!chord){lastStart=cursor;cursor+=duration;}extent=Math.max(extent,at+duration,cursor);
@@ -81,8 +98,9 @@ export function parseXML(source){
    const nominal=beats*4/unit;const duration=extent>0&& (measure.getAttribute('implicit')==='yes'||mi===0&&extent<nominal)?extent:Math.max(nominal,extent);
    measures.push({number:mi+1,start,duration,numerator:beats,denominator:unit});start+=duration;
   });
+  clefs.sort((a,b)=>a.start-b.start);for(const n of notes){const clef=clefs.findLast(c=>c.staff===(n.staff??1)&&c.start<=n.start);if(clef){n.clef=clef.sign;n.clefLine=clef.line;}}
   sharedTempos.push(...tempos);
-  return {id,name:(definition?val(definition,'part-name','Parte '+(pi+1)):'Parte '+(pi+1)).trim(),program,percussion,notes:notes.sort((a,b)=>a.start-b.start),measures,tempos,meters:meters.length?meters:[{start:0,numerator:4,denominator:4}]};
+  return {id,name:(definition?val(definition,'part-name','Parte '+(pi+1)):'Parte '+(pi+1)).trim(),program,percussion,clefs,tuning:tuning.map(m=>m+transpose),drumInstruments,lyrics:lyrics.sort((a,b)=>a.start-b.start),harmonies:harmonies.sort((a,b)=>a.start-b.start),notes:notes.sort((a,b)=>a.start-b.start),measures,tempos,meters:meters.length?meters:[{start:0,numerator:4,denominator:4}]};
  });
  const tempoMap=[...new Map(sharedTempos.sort((a,b)=>a.start-b.start).map(t=>[t.start,t])).values()];if(!tempoMap.some(t=>t.start===0))tempoMap.unshift({start:0,bpm:120});for(const p of parts)p.tempos=tempoMap;
  if(!parts.some(p=>p.notes.length))throw Error('La partitura no contiene notas con altura.');
