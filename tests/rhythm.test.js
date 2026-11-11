@@ -30,3 +30,7 @@ test('sampler aplica la ganancia del elemento y omite completamente golpes silen
  SamplePlayer.prototype.play.call(player,track,{midi:42,velocity:.8,drumGain:.5},0,.2,{});assert.equal(event.velocity,.4);assert.equal(event.pitch,42);
  SamplePlayer.prototype.play.call(player,track,{midi:42,velocity:.8,drumGain:0},0,.2,{});assert.equal(calls,1);
 });
+
+test('silenciar la escucha desconecta solo los altavoces y conserva el bus de captura',()=>{
+ const engine=new AudioEngine(),destination={},calls=[];engine.ctx={destination};engine.limiter={disconnect:d=>calls.push(['limiter-disconnect',d]),connect:d=>calls.push(['limiter-connect',d])};engine.metro={disconnect:d=>calls.push(['metro-disconnect',d]),connect:d=>calls.push(['metro-connect',d])};engine.setMonitoring(false);assert.equal(engine.monitoring,false);assert.equal(calls.length,2);assert.ok(calls.every(c=>c[1]===destination));engine.setMonitoring(true);assert.equal(engine.monitoring,true);assert.ok(calls.some(c=>c[0]==='limiter-connect'));assert.ok(calls.some(c=>c[0]==='metro-connect'));
+});

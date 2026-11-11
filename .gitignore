@@ -9,3 +9,6 @@ __pycache__/
 !.env.example
 .openai/
 coverage/
+
+# Exportaciones locales de video
+/videos-adaptaciones-*/

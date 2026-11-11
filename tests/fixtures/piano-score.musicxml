@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<score-partwise version="4.0">
+ <work><work-title>Piano con cambio de tonalidad</work-title></work>
+ <part-list><score-part id="piano"><part-name>Piano</part-name><midi-instrument id="keys"><midi-program>1</midi-program></midi-instrument></score-part></part-list>
+ <part id="piano">
+  <measure number="0" implicit="yes">
+   <attributes><divisions>4</divisions><key><fifths>-2</fifths><mode>major</mode></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>
+   <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><stem>up</stem><staff>1</staff></note>
+   <note><chord/><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff></note>
+   <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>2</duration><tie type="start"/><voice>1</voice><type>eighth</type><staff>1</staff><notations><tied type="start"/></notations></note>
+   <backup><duration>4</duration></backup>
+   <note><pitch><step>B</step><alter>-1</alter><octave>2</octave></pitch><duration>4</duration><voice>2</voice><type>quarter</type><staff>2</staff></note>
+  </measure>
+  <measure number="1">
+   <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>2</duration><tie type="stop"/><voice>1</voice><type>eighth</type><staff>1</staff><notations><tied type="stop"/></notations></note>
+   <note><rest/><duration>14</duration><voice>1</voice><type>half</type><dot/><dot/><staff>1</staff></note>
+   <backup><duration>16</duration></backup>
+   <note><pitch><step>C</step><octave>3</octave></pitch><duration>16</duration><voice>2</voice><type>whole</type><staff>2</staff></note>
+  </measure>
+  <measure number="2">
+   <attributes><key><fifths>2</fifths></key><time><beats>3</beats><beat-type>4</beat-type></time><clef number="2"><sign>G</sign><line>2</line></clef></attributes>
+   <note><pitch><step>D</step><alter>1</alter><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><accidental>sharp</accidental><staff>1</staff></note>
+   <note><pitch><step>C</step><alter>1</alter><octave>5</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff></note>
+   <backup><duration>12</duration></backup>
+   <note><rest measure="yes"/><duration>12</duration><voice>2</voice><staff>2</staff></note>
+  </measure>
+ </part>
+</score-partwise>

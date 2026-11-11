@@ -32,3 +32,7 @@ test('las eléctricas reciben el cifrado de la guitarra y sus símbolos propios 
  const first=guitarHarmonies([acoustic,electric1,electric2],electric1),second=guitarHarmonies([acoustic,electric1,electric2],electric2);
  assert.deepEqual(first.map(h=>h.label),['A','G5','D']);assert.equal(harmonyAt({harmonies:first},2).shared,true);assert.equal(harmonyAt({harmonies:first},4).shared,false);assert.equal(harmonyAt({harmonies:second},4).label,'G');assert.equal(acoustic.harmonies[0].shared,undefined);
 });
+
+test('acordes de quinta se muestran sin 5, conservando notas y digitaciones originales',async()=>{
+ const {harmonyLabel}=await import('../dist/js/guitar.js'),chord={label:'D5',root:'D',kind:'power',frame:{notes:[{string:3,fret:7}]}};assert.equal(harmonyLabel(chord),'D');assert.equal(harmonyLabel({label:'G5/A',kind:'power'}),'G/A');assert.equal(harmonyLabel({label:'Dmaj7',kind:'major-seventh'}),'Dmaj7');assert.equal(chord.label,'D5');assert.equal(chord.frame.notes[0].fret,7);
+});

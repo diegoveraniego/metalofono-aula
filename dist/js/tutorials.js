@@ -11,8 +11,8 @@ export function prepareTutorial(parts,index,{prefs={},opts={},pitchSource='writt
  if(instrument==='guitarra')notes=guitarNotes(notes,octave*12+semitones);
  if(instrument==='bajo')notes=bassNotes(notes,original);
  const part=instrument==='guitarra'?{...original,harmonies:guitarHarmonies(parts,original)}:original;
- const name=partDisplayName(parts,index),options={...opts,instrument,base,cascade:pref.cascade??['piano','metalofono'].includes(instrument),partUnavailable:false,maxDuration:notes.reduce((max,n)=>Math.max(max,n.duration),.2),teacher:name+(opts.teacher?' · '+opts.teacher:'')};
- if(instrument==='voz'){options.vocalPartName=name;options.vocalPhrases=vocalPhrases(part.lyrics,notes);options.vocalNotes=notes;options.vocalRange=vocalPitchRange(notes);options.vocalPages=options.vocalPhrases.map(p=>vocalPhraseNotes(p,notes));}
+ const name=partDisplayName(parts,index),options={...opts,vocalOverview:false,instrument,base,cascade:pref.cascade??['piano','metalofono'].includes(instrument),partUnavailable:false,maxDuration:notes.reduce((max,n)=>Math.max(max,n.duration),.2),teacher:name+(opts.teacher?' · '+opts.teacher:'')};
+ if(instrument==='voz'){options.vocalColorIndex=Math.max(0,parts.filter(p=>p.lyrics?.length).findIndex(p=>p.id===part.id));options.vocalPartName=name;options.vocalPhrases=vocalPhrases(part.lyrics,notes);options.vocalNotes=notes;options.vocalRange=vocalPitchRange(notes);options.vocalPages=options.vocalPhrases.map(p=>vocalPhraseNotes(p,notes));}
  if(instrument==='bateria')options.drumLanes=drumLanes(notes);
  return {part,notes,opts:options,name};
 }

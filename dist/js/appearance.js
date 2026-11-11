@@ -3,6 +3,8 @@ import {sectionFamily} from './structure.js';
 const base={id:'aula',name:'Aula · original',dark:false,bg:'#f8f7f2',panel:'#fffefa',ink:'#233d35',muted:'#728078',line:'#d3d9ce',soft:'#eef0e7',accent:'#284d40',onAccent:'#fffefa',warning:'#d18c4c'};
 export const THEMES={
  aula:base,
+ 'chimera-light':{id:'chimera-light',name:'Chimera · claro',dark:false,bg:'#ffffff',panel:'#ffffff',ink:'#111111',muted:'#505967',line:'#cbd0d6',soft:'#f2f5f8',accent:'#176ca4',onAccent:'#ffffff',warning:'#a35b08'},
+ chimera:{id:'chimera',name:'Chimera · vector oscuro',dark:true,bg:'#000000',panel:'#000000',ink:'#effbff',muted:'#4fb6f2',line:'#133954',soft:'#081724',accent:'#4fb6f2',onAccent:'#000000',warning:'#ffb340'},
  'modus-operandi':{id:'modus-operandi',name:'Modus Operandi · claro',dark:false,bg:'#ffffff',panel:'#f2f2f2',ink:'#000000',muted:'#595959',line:'#9f9f9f',soft:'#e0e0e0',accent:'#0031a9',onAccent:'#ffffff',warning:'#884900'},
  'modus-vivendi':{id:'modus-vivendi',name:'Modus Vivendi · oscuro',dark:true,bg:'#000000',panel:'#1e1e1e',ink:'#ffffff',muted:'#b0b0b0',line:'#646464',soft:'#303030',accent:'#79a8ff',onAccent:'#000000',warning:'#fec43f'},
  'catppuccin-latte':{id:'catppuccin-latte',name:'Catppuccin Latte · claro',dark:false,bg:'#eff1f5',panel:'#e6e9ef',ink:'#4c4f69',muted:'#5c5f77',line:'#9ca0b0',soft:'#ccd0da',accent:'#8839ef',onAccent:'#ffffff',warning:'#8a4b00'},
@@ -14,6 +16,8 @@ export const THEMES={
  'tokyo-night':{id:'tokyo-night',name:'Tokyo Night · oscuro',dark:true,bg:'#1a1b26',panel:'#16161e',ink:'#c0caf5',muted:'#a9b1d6',line:'#414868',soft:'#292e42',accent:'#7aa2f7',onAccent:'#16161e',warning:'#e0af68'}
 };
 const MUSICAL_ACCENTS={
+ 'chimera-light':['#176ca4','#228344','#a35b08','#b33283','#c43a28','#7754aa','#257b87'],
+ chimera:['#4fb6f2','#5be381','#ffb340','#ff73cf','#ff5d40','#eef6f8','#3487c4'],
  aula:['#7b91bb','#a1bc90','#e4cd7a','#dfa270','#d68079','#a28abc','#94c3d1'],
  'modus-operandi':['#0031a9','#006800','#6f5500','#884900','#a60000','#721045','#005e8b'],
  'modus-vivendi':['#79a8ff','#44bc44','#d0bc00','#feac64','#ff5f59','#b6a0ff','#2fafff'],
@@ -34,6 +38,7 @@ export function musicalPalette(opts={}){
 export function sectionFillColor(section,opts={}){const t=visualTheme(opts);const key=section?.name?.trim().toLowerCase(),overrides=opts.appearance?.sectionColors?.[t.id];return t.id==='aula'?(section?.color??'#68766e'):section?.gap||!section?t.line:overrides&&Object.hasOwn(overrides,key)?overrides[key]:musicalPalette(opts).sections[sectionFamily(section.name)];}
 export function themedSections(sections,opts={}){return sections.map(s=>({...s,color:sectionFillColor(s,opts)}));}
 export const FONTS={
+ inter:{name:'Inter · predeterminada',family:'Inter, system-ui, sans-serif'},
  system:{name:'Sistema · sans serif',family:'system-ui, -apple-system, "Segoe UI", sans-serif'},
  noto:{name:'Noto Sans',family:'"Noto Sans", Arial, sans-serif'},
  arial:{name:'Arial / Liberation Sans',family:'Arial, "Liberation Sans", sans-serif'},
@@ -44,8 +49,8 @@ export const FONTS={
  atkinson:{name:'Atkinson Hyperlegible · local',family:'"Atkinson Hyperlegible", "Atkinson Hyperlegible Next", Arial, sans-serif'},
  dyslexic:{name:'OpenDyslexic · local',family:'OpenDyslexic, "OpenDyslexic3", Arial, sans-serif'}
 };
-export const DEFAULT_APPEARANCE={menu:'aula',video:'same',font:'system',borders:'soft',textSize:100,applyVideo:true,highContrast:false,noteColors:{},sectionColors:{}};
-export function normalizeAppearance(value={}){if(!value||typeof value!=='object'||Array.isArray(value))value={};return {menu:Object.hasOwn(THEMES,value.menu)?value.menu:'aula',video:value.video==='same'||Object.hasOwn(THEMES,value.video)?value.video:'same',font:Object.hasOwn(FONTS,value.font)?value.font:'system',borders:['soft','square','round','strong'].includes(value.borders)?value.borders:'soft',textSize:Math.min(130,Math.max(90,Number(value.textSize)||100)),applyVideo:typeof value.applyVideo==='boolean'?value.applyVideo:true,highContrast:!!value.highContrast,noteColors:Object.fromEntries(Object.entries(value.noteColors??{}).filter(([id,colors])=>Object.hasOwn(THEMES,id)&&Array.isArray(colors)&&colors.length===12&&colors.every(c=>typeof c==='string'&&/^#[a-f\d]{6}$/i.test(c))).map(([id,colors])=>[id,[...colors]])),sectionColors:Object.fromEntries(Object.entries(value.sectionColors??{}).filter(([id,colors])=>Object.hasOwn(THEMES,id)&&colors&&typeof colors==='object'&&!Array.isArray(colors)).map(([id,colors])=>[id,Object.fromEntries(Object.entries(colors).filter(([name,color])=>name.length<=100&&typeof color==='string'&&/^#[a-f\d]{6}$/i.test(color)))]))};}
+export const DEFAULT_APPEARANCE={menu:'aula',video:'same',font:'inter',borders:'soft',textSize:100,applyVideo:true,highContrast:false,noteColors:{},sectionColors:{}};
+export function normalizeAppearance(value={}){if(!value||typeof value!=='object'||Array.isArray(value))value={};return {menu:Object.hasOwn(THEMES,value.menu)?value.menu:'aula',video:value.video==='same'||Object.hasOwn(THEMES,value.video)?value.video:'same',font:Object.hasOwn(FONTS,value.font)?value.font:'inter',borders:['soft','square','round','strong'].includes(value.borders)?value.borders:'soft',textSize:Math.min(130,Math.max(90,Number(value.textSize)||100)),applyVideo:typeof value.applyVideo==='boolean'?value.applyVideo:true,highContrast:!!value.highContrast,noteColors:Object.fromEntries(Object.entries(value.noteColors??{}).filter(([id,colors])=>Object.hasOwn(THEMES,id)&&Array.isArray(colors)&&colors.length===12&&colors.every(c=>typeof c==='string'&&/^#[a-f\d]{6}$/i.test(c))).map(([id,colors])=>[id,[...colors]])),sectionColors:Object.fromEntries(Object.entries(value.sectionColors??{}).filter(([id,colors])=>Object.hasOwn(THEMES,id)&&colors&&typeof colors==='object'&&!Array.isArray(colors)).map(([id,colors])=>[id,Object.fromEntries(Object.entries(colors).filter(([name,color])=>name.length<=100&&typeof color==='string'&&/^#[a-f\d]{6}$/i.test(color)))]))};}
 export function visualTheme(opts={}){const appearance=opts.appearance;if(!appearance?.applyVideo)return base;const t=THEMES[appearance.video==='same'?appearance.menu:appearance.video]??base;return appearance.highContrast?{...t,muted:t.ink,line:t.ink}:t;}
 export function canvasFont(font,appearance){if(!appearance?.applyVideo||appearance.font==='system')return font;return font.replace(/system-ui\b/g,FONTS[appearance.font]?.family??FONTS.system.family);}
 export function styledContext(ctx,getAppearance){

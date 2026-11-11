@@ -2,6 +2,7 @@
 
 Selecciones de colores adaptadas a la interfaz de adaptaciones / aula. Se escribieron los estilos y la integración del visualizador específicamente para esta aplicación; no se incorporó código de los motores de temas originales.
 
+- Chimera: Jameson D. Hall, https://github.com/jamesondh/chimera-vocal-synth · colores de `src/ui/colors.ts` (MIT). Las fuentes originales de la vista Chimera y sus licencias están en `fonts/chimera/`.
 - Modus Operandi y Modus Vivendi: Protesilaos Stavrou, https://protesilaos.com/modus-themes/ y https://github.com/protesilaos/modus-themes
 - Catppuccin Latte y Mocha: Catppuccin, https://github.com/catppuccin/palette y https://github.com/catppuccin/catppuccin
 - Nord: Arctic Ice Studio / Sven Greb, https://www.nordtheme.com/docs/colors-and-palettes/

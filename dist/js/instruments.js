@@ -7,10 +7,11 @@ export const INSTRUMENTS={
  piano:{name:'Piano',span:48,keys:49,base:36,maxBase:79}
 };
 export function instrumentConfig(type){return INSTRUMENTS[type]??INSTRUMENTS.metalofono;}
+export function isChoralVoice(part){return /soprano|contralto|\balto\b|tenor|bar[ií]tono|bajo coral|bass voice/i.test(part.name)||!!part.lyrics?.length&&part.program>=52&&part.program<=54;}
 export function matchesInstrument(part,type){
  const name=part.name.toLowerCase(),program=part.program;if(type==='bateria')return !!part.percussion;if(part.percussion)return false;
- if(type==='bajo')return /bajo|bass/.test(name)||Number.isInteger(program)&&program>=32&&program<=39;
- if(type==='voz'){if(/voz|vocal|voice|coro|choir|cant[oa]/.test(name))return true;if(/metal[oó]fono|glock|xil[oó]fono|piano|teclado|sinte|synth|guitarra|guitar|bajo|bass/.test(name))return false;return !!part.lyrics?.length;}
+ if(type==='bajo')return !isChoralVoice(part)&&(/bajo|bass/.test(name)||Number.isInteger(program)&&program>=32&&program<=39);
+ if(type==='voz'){if(isChoralVoice(part))return true;if(/voz|vocal|voice|coro|choir|cant[oa]/.test(name))return true;if(/metal[oó]fono|glock|xil[oó]fono|piano|teclado|sinte|synth|guitarra|guitar|bajo|bass/.test(name))return false;return !!part.lyrics?.length;}
  if(type==='guitarra')return /guitarra|guitar/.test(name)||Number.isInteger(program)&&program>=24&&program<=31;
  if(type==='piano'){if(/teclado|piano|sinte|synth|keyboard|organ|órgano|rhodes|clavi/.test(name))return true;if(/metal[oó]fono|glock|campana|guitarra|guitar|bajo|bass|voz|vocal|bater[ií]a/.test(name))return false;return Number.isInteger(program)&&(program>=0&&program<=7||program>=16&&program<=23||program>=80&&program<=103);}
  return /metal[oó]fono|glock|xil[oó]fono/.test(name)||Number.isInteger(program)&&program>=8&&program<=15;
@@ -19,6 +20,7 @@ export function matchesInstrument(part,type){
 export function defaultInstrument(part){
  const name=part.name.toLowerCase();
  if(part.percussion)return 'bateria';
+ if(isChoralVoice(part))return 'voz';
  if(/voz|vocal|voice|coro|choir|cant[oa]/.test(name))return 'voz';
  if(/bajo|bass/.test(name))return 'bajo';
  if(/guitarra|guitar/.test(name))return 'guitarra';

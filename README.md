@@ -1,5 +1,7 @@
 # adaptaciones / aula
 
+**Versión actual: [v1.10.0](https://github.com/diegoveraniego/metalofono-aula/releases/tag/v1.10.0)** · [Historial de cambios](CHANGELOG.md) · [Créditos](dist/credits.html)
+
 Aplicación libre (MIT) para adaptar partituras MusicXML/MXL o MIDI a visualizaciones de metalófono, piano, guitarra, bajo, batería y voz con letra sincronizada. Parte de un kit de herramientas de código abierto para docentes y estudiantes de música. HTML, CSS y módulos JavaScript sin backend, sin cuentas, sin analítica, sin CDN y sin dependencias de instalación. Todo el procesamiento permanece en el dispositivo.
 
 La pantalla principal muestra el player, la carga de partituras, pantalla completa y un selector de parte. Elige Voz, Guitarra eléctrica 1, Bajo u otra parte para activar automáticamente su visualización conservando la posición de reproducción. La configuración permite elegir manualmente otro tipo de instrumento. Pantalla completa usa la función del navegador cuando está disponible; si no, activa pantalla limpia. Esc o «Volver al player» permiten salir. La rueda de configuración reúne Partitura, Instrumento, Audio, Práctica y Video y ayuda. En Voz, «Mostrar nombres de notas» está desactivado por defecto y puede activarse en Configuración → Instrumento. La cuenta de entrada indica pulsos y su equivalencia en compases, respetando el compás de la partitura o el ajuste manual.
@@ -10,17 +12,85 @@ En Bajo se leen las cuerdas, los trastes y la afinación del MXL, incluida su tr
 
 En piano, la cascada y las teclas activas usan morado para la mano derecha (clave de Sol) y naranja para la mano izquierda (clave de Fa). La leyenda muestra dos íconos de mano en esos colores. El importador conserva el pentagrama y los cambios de clave del MXL; no deduce la clave por si una nota es grave o aguda. Los archivos MIDI o sin clave declarada usan un color neutro. Configuración → Instrumento → Sonido, apariencia y anticipación permite activar «Mostrar nombres en las notas que bajan», con los nombres y octavas que hayas elegido.
 
-En Configuración → Video y ayuda, «Grabar todas las partes» genera un video por parte durante una única reproducción. Cada video tiene su visualización, comparte la mezcla de audio actual y se entrega dentro de un ZIP. Las partes con el mismo nombre se numeran. La grabación requiere mantener la pestaña visible y sucede en tiempo real; no es exportación sin navegador. La resolución y el formato se eligen antes de grabar. El ZIP admite hasta 4 GB.
+En Configuración → Video y ayuda, «Grabar todas · una por una» genera un video por parte en una cola: cada video reproduce la obra completa antes de empezar el siguiente, usando un solo codificador a la vez. Cada video tiene su visualización, comparte la mezcla de audio actual y se entrega dentro de un ZIP. Las partes con el mismo nombre se numeran. La grabación requiere mantener la pestaña visible y sucede en tiempo real; no es exportación sin navegador. La resolución y el formato se eligen antes de grabar. El ZIP admite hasta 4 GB.
 
 Los elementos de batería tienen volumen 0–200% y silencio independientes en Configuración → Instrumento. Los ajustes se conservan durante la sesión y afectan tanto al tutorial como al acompañamiento sintetizado y a las grabaciones. Un audio externo ya mezclado conserva su mezcla y no se puede separar por elemento.
 
-Configuración → Instrumento → Instrucción inicial del video permite activar un texto editable por parte y elegir su duración (2–30 segundos). El texto sugerido para guitarra explica cómo alternar melodía y acordes. La pantalla se graba en silencio antes de la cuenta previa, sin avanzar la música. En una grabación múltiple, todas las partes usan la duración de preparación más larga para mantener sincronía; las partes sin texto activado muestran una pantalla de preparación. Las instrucciones se conservan durante la sesión.
+Configuración → Instrumento → Instrucción inicial del video permite activar un texto editable por parte y elegir su duración (2–30 segundos). El texto sugerido para guitarra explica cómo alternar melodía y acordes. La pantalla se graba en silencio antes de la cuenta previa, sin avanzar la música. En la grabación en cola cada parte usa su propia instrucción y duración. En la exportación local las partes comparten la preparación más larga para sincronizar los MP4; las partes sin texto activo muestran una pantalla de preparación. Las instrucciones se conservan durante la sesión.
 
 El botón de pincel abajo a la izquierda abre «Estilos del aula · Dev / testing». Permite probar Modus Operandi/Vivendi, Catppuccin Latte/Mocha, Nord, Gruvbox y Tokyo Night; cambiar tipografía, tamaño de texto de menús, bordes y refuerzo de contraste. La paleta del visualizador puede seguir la del menú o elegirse aparte. Las opciones se guardan localmente y pueden exportarse/importarse como JSON. El botón Restablecer vuelve al estilo Aula.
 
 «Aplicar también al visualizador y los videos» cambia los fondos, textos y bordes del canvas, incluidas las instrucciones iniciales y la grabación de todas las partes. Los colores de notas, láminas, manos, cuerdas, batería y secciones se adaptan al tema activo manteniendo su diferenciación. Las ediciones manuales de notas y secciones se guardan por tema dentro del preset. El panel de testing no se incluye en los videos y no permite cambios durante la grabación. El tamaño de texto del panel afecta solo a los menús, para conservar el diseño temporal de las visualizaciones.
 
 Las fuentes se resuelven en el equipo; si Comic Sans, Atkinson Hyperlegible u otra no está instalada, se usa una alternativa. También se puede cargar un archivo TTF/OTF/WOFF/WOFF2 local durante la sesión. No se incluyen archivos de fuentes en los presets JSON; para recuperar una fuente personalizada hay que cargarla de nuevo. Referencias de las paletas en `dist/licenses/appearance-palettes.md`.
+
+## Piano con partitura y alteraciones para enseñar
+
+En **Configuración → Instrumento → Partitura del piano**, activa «Mostrar
+partitura con seguimiento arriba del teclado». Está desactivada de inicio.
+Muestra la escritura del MXL/MusicXML en hasta dos pentagramas, con claves,
+armaduras convencionales, compases, acordes, silencios, figuras, puntillos y
+ligaduras de prolongación. El cursor avanza con el reloj de audio, resalta las
+notas activas y desplaza la vista; pausa, saltos, bucles y cambios de velocidad
+usan la misma posición. Mientras está habilitada ocupa el lugar de la cascada
+superior. También se incluye en la grabación y los trabajos de exportación local.
+
+La vista es una reducción didáctica; no reproduce la maquetación completa de
+MuseScore, sus articulaciones ni todas sus indicaciones. Conserva las alturas
+escritas originales aunque se transponga el tutorial. Los archivos MIDI y el
+ejemplo generado sin MusicXML muestran una indicación para cargar una partitura.
+Los símbolos usan Noto Music incluido localmente, sin descargas externas.
+
+En los ajustes del instrumento, **Alteraciones para enseñar** permite elegir
+«Automático · armadura de la partitura», «Preferir sostenidos» o «Preferir
+bemoles». Afecta a nombres de notas y a la escritura del piano, sin modificar el
+sonido. En automático, la partitura conserva la grafía original y los nombres
+prefieren bemoles con armaduras negativas y sostenidos con armaduras positivas
+o sin armadura. Los cambios de armadura del MusicXML se respetan durante la obra.
+
+En **Práctica → Estructura de la obra**, cada sección tiene un selector de
+alteraciones. Usa «Usar ajuste general» o elige una preferencia propia; al editar
+una sección puedes cambiarla. La elección se autoguarda y se conserva al
+exportar/importar la estructura JSON y al exportar videos. Las estructuras
+anteriores sin esa propiedad siguen funcionando. Las preferencias generales de
+partitura y alteraciones se guardan en este navegador.
+
+La importación usa el primer `rootfile` de `META-INF/container.xml` del MXL y
+mantiene la notación separada de los eventos sonoros: una ligadura puede ser una
+nota sostenida para audio y varias figuras para lectura. Referencias oficiales:
+[MXL](https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/),
+[notas y notación](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/note/),
+[claves](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/clef/),
+[voces y backup](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/backup/).
+Licencia de la fuente: `dist/licenses/NotoMusic-OFL.txt`.
+
+## Dos formas de exportar
+
+En Configuración → Video y ayuda se puede elegir:
+
+- **Desde la página:** grabación en tiempo real de la parte actual o de todas en cola, una tras otra. Es necesario mantener la pestaña visible. «Escuchar mientras se graba» silencia solo los altavoces, conservando el audio del video. Si se detectan pausas de más de 100 ms entre dibujos, al terminar se avisa; este aviso no certifica el framerate del archivo.
+- **Exportación local:** guarda un trabajo JSON con las partes, paletas, instrucciones, mezcla y fuente personalizada cargada. El ejecutor dibuja todos los cuadros a 30 fps sin reproducir en tiempo real y los envía a FFmpeg. Si tarda más en dibujar, el procesamiento se alarga y no se omiten cuadros para seguir un reloj en vivo. Se puede cerrar la página después de guardar el trabajo. Solo requiere mantener el equipo encendido y la terminal en ejecución.
+
+Requiere Node.js 20 o posterior, Chromium/Google Chrome y FFmpeg instalados. Usa la carpeta del proyecto:
+
+```sh
+npm run render -- --check
+npm run render -- "/ruta/al/trabajo-local.json"
+```
+
+Para probar ocho segundos antes de procesar una canción completa:
+
+```sh
+npm run render -- "/ruta/al/trabajo-local.json" --seconds 8 --part 1
+```
+
+Las salidas son MP4 separados en una carpeta `videos-adaptaciones-...`. `--out carpeta` elige otra carpeta; nunca se sobrescribe un archivo existente. `--list` lista las partes, `--part 1` procesa solo una y `--seconds 8` limita la prueba. `--chrome /ruta/chromium` y `--ffmpeg /ruta/ffmpeg` permiten indicar los ejecutables (también `CHROME_BIN` / `FFMPEG_BIN`). El navegador se ejecuta sin interfaz con un perfil temporal y un servidor enlazado solo a `127.0.0.1`; no se usa la cuenta ni el perfil personal. Los archivos permanecen en el equipo.
+
+La exportación local usa los sonidos muestreados de la partitura, las alturas, tempos, volúmenes y silencios configurados; no admite pistas de audio externas y lo indica antes de guardar el trabajo. El audio se genera con OfflineAudioContext y se reutiliza en los MP4. La fuente local cargada se incluye en el trabajo; las otras fuentes requieren que estén instaladas. No se emiten sonidos por los altavoces.
+
+Referencias de implementación: [Chrome Headless](https://developer.chrome.com/docs/automation-and-testing/headless), [FFmpeg image2](https://ffmpeg.org/ffmpeg-formats.html#image2-2). Esta vía necesita validación final en el equipo de uso: los entornos que bloquean servidores locales o procesos Chromium pueden impedir el recorrido completo aunque FFmpeg esté instalado.
+
+Los símbolos de acordes de quinta se muestran sin el sufijo 5 (G5 → G, D5 → D); las notas y digitaciones de la partitura se conservan. La adaptación a ukelele queda pendiente.
 
 ## Abrir la aplicación
 
@@ -104,125 +174,32 @@ En el entorno de desarrollo pasaron las pruebas automáticas de Node; no se pudo
 
 Para actualizar la app, cambia el nombre de caché en `dist/sw.js`; sirve la carpeta actualizada y vuelve a abrir. No mezcles archivos de versiones distintas. Los cambios de estructura no requieren actualizar la aplicación.
 
-## Acompañamiento (v1.1)
 
-Se reproducen las otras partes de la misma partitura, sin reducir sus acordes y sin aplicarles la transposición escolar del tutorial. Cada parte tiene volumen, Silenciar y Solo; Solo deja oír esa parte junto al tutorial. La fila de la parte seleccionada se controla mediante «Volumen de melodía» y «Silenciar melodía», para no duplicarla en el acompañamiento. Las guitarras eléctricas con el mismo nombre se numeran en el mezclador. La batería usa percusión sintetizada. Voz toca una aproximación instrumental de las notas: no sintetiza letra ni una interpretación vocal realista. Los tempos se comparten entre partes aunque MuseScore solo los escriba en el primer pentagrama.
 
-**Para ensayar:** la síntesis del MXL permite cambiar velocidad sin cambiar tono. No necesitas exportar las pistas antes.
+Los teclados usan piano acústico por defecto; las partes llamadas Synth o Sintetizador usan sintetizador. En Configuración → Instrumento → Sonido del teclado puedes elegir piano acústico, eléctrico, FM o synth por parte. Las muestras de piano adicionales proceden de MS Basic (MIT), incluido con MuseScore; se generan con `python3 scripts/build-keyboard-samples.py` desde el banco local instalado. Las voces toman la vocal sostenida de la muestra y conservan la duración de la nota antes de una breve liberación.
 
-**Para conservar los timbres de MuseScore en un video:** exporta cada parte como WAV (sin compresión con pérdida), o MP3 para reducir tamaño. Usa «Cargar audio» en su fila: reemplaza la síntesis de esa parte, sin duplicarla. Todas deben comenzar en el mismo instante, incluyendo los silencios del inicio y la anacrusa; no recortes cada pista a su primera nota. Exporta sin cuenta previa. Las repeticiones y saltos deben coincidir exactamente con la lectura lineal de la app. Comprueba inicio, centro y final de la canción para detectar desajustes. Si exportas una sola mezcla sin metalófono, puedes cargarla en una fila y silenciar todas las demás partes de acompañamiento.
 
-Las pistas cargadas entran en el mismo bus de audio que captura el video. Cuenta previa, pausa, reinicio, salto y bucles detienen y reanudan sus fuentes con el reloj Web Audio. Por ahora, **audio externo fija la velocidad al 100% y utiliza el tempo original del archivo**, porque cambiar `AudioBufferSourceNode.playbackRate` altera la afinación. Estirar audio conservando tono requiere un motor adicional de time stretching; no se simula cambiando la tasa de reproducción. La transposición de las láminas no transpone el audio externo. Los audios no se autoguardan: vuelve a cargarlos en cada sesión. Límite por archivo: 64 MB; límite combinado PCM decodificado: 256 MB. Una mezcla única consume menos memoria que nueve pistas. Los formatos aceptados dependen de `decodeAudioData` del navegador.
+Chimera es una integración opcional del motor vocal y el dibujo anatómico originales (MIT). Con el repositorio junto a este proyecto, ejecuta `npm run chimera:build` desde una terminal con acceso a Internet: instala el target Rust WebAssembly, compila el motor y empaqueta el adaptador con Bun. No necesita instalar React ni Three.js para nuestra vista 2D. Después recarga la página y elige **Coro Chimera**, o **Configuración → Chimera**. Cada parte permite male, female o child sin transponer sus notas.
 
-Fuentes: [exportar formatos desde MuseScore](https://handbook.musescore.org/file-management/file-export), [transposición escrita/sonora en MusicXML](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/transpose/), [playbackRate y remuestreo](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/playbackRate).
+El audio de las voces se prepara una por una en un Web Worker del navegador, con pronunciación inglesa y conservación de los melismas. La articulación del motor alimenta el dibujo original. Pausar, saltar de compás y cambiar velocidad mantienen el reloj del player; al cambiar tempo o modelo se vuelve a preparar el audio. Durante la preparación, el botón de reproducción permite cancelarla. Si falta `dist/vendor/chimera/chimera.wasm`, la interfaz muestra el comando de compilación y conserva el motor muestreado. La grabación desde la página captura Chimera; su exportación local por FFmpeg aún no está soportada y se rechaza explícitamente. Se comprobó en Chromium la preparación de las seis voces del MXL de prueba y su animación sin errores de ejecución.
 
-### Regresión con everybodyV2.mxl
 
-Se probó el archivo local del docente (no se incluye en este repositorio ni en el ZIP). Resultado: 9 partes, 123 compases alineados, tempo compartido 112 BPM, metalófono con 212 ataques tras unir ligaduras, primera entrada en el compás 6, alturas escritas MIDI 62–79 y sonoras 86–103. El rango escolar 55–79 contiene todos los ataques escritos y ninguno de los sonoros. Acompañamiento: 5.203 ataques, incluyendo 2.248 de batería.
+Las voces de Chimera preparadas se conservan en IndexedDB (hasta 256 MB, retirando primero las menos usadas), incluyendo audio, articulación y fonemas. La caché distingue notas, letra, modelo, tempo y versión del motor; cambiar de parte no invalida el mismo reloj musical. **Preparación de Chimera** permite procesar todas (predeterminado) o solo la seleccionada. En individual se recuperan también las voces ya guardadas, y la vista general prepara las que falten. Puedes borrarlas desde **Borrar voces guardadas**. El navegador puede liberar este almacenamiento; en navegación privada o sin espacio la reproducción sigue funcionando sin garantía de conservación. Los perfiles por voz y el modo de preparación se recuerdan localmente.
 
-Reproducir la regresión local:
+La vista Coro Chimera activa pantalla completa (o pantalla limpia si el navegador no permite fullscreen); Esc permite salir. El laboratorio de estilos incluye **Chimera · vector oscuro**, con la paleta original aplicada al menú y a los colores musicales. La vista Chimera usa localmente Hershey Simplex y Archivo, con sus licencias, para sus etiquetas, modelos, sílabas y fonemas.
 
-```sh
-python3 scripts/xml-test-tree.py /home/diego/Descargas/everybodyV2.mxl /tmp/everybodyV2.tree.json
-node scripts/test-everybody.mjs /home/diego/Descargas/everybodyV2.mxl /tmp/everybodyV2.tree.json
-```
+Cada voz permite seleccionar male, female o child desde Configuración → Chimera. El cambio actualiza inmediatamente la anatomía de la figura y prepara el nuevo timbre al reproducir, conservando notas y octavas. El cabello es una capa visual propia de aula: automático (largo en female), sin cabello, corto o largo, independiente del motor y sin regenerar audio. Ambas elecciones se guardan por partitura. Las pruebas con el WebAssembly real comparan los tres timbres y sus dimensiones anatómicas manteniendo La4.
 
-El árbol DOM de pruebas se genera con ElementTree de Python y se vincula por SHA-256 al texto XML que descomprime el parser de producción. Esto prueba el recorrido y conversión del archivo real en Node sin instalar un DOM. No sustituye la comprobación en un navegador. Además hay 14 pruebas automáticas, con un conjunto sintético y libre para comprobar transposición, nombres/IDs XML, tempo compartido, percusión, mezclador y planificación de acordes/notas sostenidas.
+El editor **Configuración → Chimera → Editar sílabas de Chimera** conserva las separaciones y posiciones del MXL. Cada casilla corresponde a una sílaba escrita; las correcciones y el marcador `-` se guardan por voz y partitura, y **Restaurar MXL** recupera el texto original. Cuando una palabra ocupa más fragmentos escritos que sílabas pronunciadas, como li–fe, la vocal se prolonga sin repetir el ataque; si el diccionario añade sílabas, como tumbling, se usan los fragmentos explícitos del MXL. Se respetan también las sílabas que comienzan dentro de una ligadura. Solo se invalida el audio de la voz editada.
 
-Para actualizar desde la versión anterior recarga con **Ctrl+Shift+R**. En el pie debe aparecer **v1.1**. Si el servidor sigue abierto sobre la misma carpeta no necesitas reiniciarlo. La caché offline se actualizó a v2.
+La preparación de Chimera omite silencios largos: agrupa las frases cercanas, conserva 0,3 s de preparación y 1,25 s de cola, y mantiene los 48 kHz del motor original. Cada tramo se guarda también en IndexedDB: editar una sílaba vuelve a calcular su tramo y reutiliza los demás. Las pausas cortas se procesan juntas para conservar sus transiciones; al comenzar un grupo después de un silencio largo se reinicia el estado del sintetizador. La primera síntesis de una frase cantada sigue dependiendo de la CPU. En una medición local con 10 s de línea de tiempo y una nota de 1 s, la referencia tardó 11,7 s y la versión por tramos 3,2 s; esa proporción no representa una promesa para todas las partituras.
 
-## Barra de estructura (v1.2)
+### Lectura de cuerdas pulsadas
 
-La barra de progreso incluye bloques horizontales de color con nombre y rango, por ejemplo **Intro · cc 1–5** (rojo) y **Pre-verso 1 · cc 6–14** (azul). El bloque actual se resalta, se rellena al avanzar y sigue el cursor. Cuando cambia la sección durante la reproducción, la barra se desplaza para mantenerla visible. Puedes recorrerla manualmente y pulsar cualquier bloque para saltar a su primer compás; esto desactiva el bucle anterior. El deslizador fino de posición se mantiene debajo.
+Guitarra y bajo abren por defecto una tablatura con dos sistemas fijos y cursor de lectura. MusicXML utiliza alphaTab para el espaciado y los signos rítmicos; el archivo completo se prepara en un worker y se conserva en memoria. El cursor recorre las notas de izquierda a derecha; la ventana avanza de cuatro en cuatro compases, conservando la línea que ya se veía como anticipación. La partitura completa se prepara y reutiliza. La métrica y las duraciones proceden del archivo, incluyendo anacrusas y cambios de compás. El selector del player conserva «Notas en movimiento» como alternativa y guarda la preferencia. Los acordes escritos y sus diagramas se muestran centrados sobre la estructura; sin diagrama escrito se usan las posiciones de las notas simultáneas. Esta vista es una tablatura pedagógica, no un grabador completo de notación: las posiciones propuestas llevan asterisco.
 
-Las marcas `rehearsal` del MXL/MusicXML se convierten automáticamente en secciones: cada una termina justo antes de la siguiente y la última llega al último compás. Se mantienen los cambios manuales guardados. «Secciones de partitura» permite recuperar explícitamente las marcas originales. Los huecos aparecen como «Sin sección». También puedes cargar la guía JSON exportada desde Compás: convierte `start`/`end` a límites de compás y conserva sus colores personalizados.
+Créditos de integraciones y referencias: [Chimera](https://github.com/jamesondh/chimera-vocal-synth), [It's MyTabs](https://github.com/louislam/its-mytabs), [feedBack](https://github.com/got-feedback/feedBack), UltraStar Deluxe y demás recursos en [la página de créditos](dist/credits.html). La vista MusicXML usa alphaTab 1.8.4 (MPL-2.0), distribuido sin modificar. MyTabs y feedBack son referencias de interacción. Se conserva el renderizador sencillo como alternativa para datos sin fuente MusicXML.
 
-El canvas del video muestra los mismos nombres y rangos en una tira que sigue la sección actual; los bloques son legibles y los que quedan fuera se desplazan. Las posiciones se calculan con las duraciones reales de compás, incluida la anacrusa de Everybody. Los colores siguen siendo editables en Estructura.
+## Versiones y publicaciones
 
-Verificación v1.2: 18 pruebas automáticas y regresión con las 17 marcas de `everybodyV2.mxl`, desde Intro 1–5 hasta Outro 106–123. La validación visual en navegador sigue limitada por el entorno indicado anteriormente. `progress.js` comparte el cálculo musical entre barra HTML y canvas. Recarga con Ctrl+Shift+R y comprueba **v1.2** en el pie; caché offline v3.
-
-## Publicación y control de versiones (v1.3)
-
-La pantalla y el video ya no muestran «25 láminas · Sol3–Sol5», «Escucha. Anticipa. Toca.» ni el pie «Metalófono Aula · Creado para aprender». El rango sigue disponible en los ajustes del instrumento. Recarga con Ctrl+Shift+R y comprueba v1.3 en la interfaz.
-
-El repositorio incluye `.github/workflows/pages.yml`: comprueba los módulos y ejecuta las pruebas en cada push/pull request a `main`; publica únicamente `dist/` en GitHub Pages tras pasar los controles en `main`. No publica archivos de partituras o audio personales. Las rutas relativas permiten servir la aplicación bajo `/metalofono-aula/` y conservar la caché offline en HTTPS.
-
-Para activar la publicación en un repositorio público de GitHub: **Settings → Pages → Build and deployment → Source → GitHub Actions**. Después ejecuta el flujo «Comprobar y publicar GitHub Pages» desde Actions, o sube un cambio a `main`. La dirección real se muestra en el resultado del trabajo `deploy` y en Settings → Pages. No se requiere dominio propio ni servidor de aplicación.
-
-Consulta la [configuración oficial de GitHub Pages con Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Una vez publicado, cualquier docente puede cargar sus archivos localmente; las partituras y audios no se envían a GitHub.
-
-## Paleta de estructura (v1.4)
-
-Las secciones usan tonos suaves coordinados con la interfaz: salvia, azul grisáceo, verde, lavanda, arena y ocre. Se distinguen de los colores más saturados de las láminas; cada bloque conserva nombre, rango de compases y resaltado activo. La misma paleta aparece en la barra HTML y en el video. Al cargar estructuras guardadas o importadas, los seis colores predeterminados intensos de versiones anteriores se actualizan cuando corresponden al tipo de sección; los colores personalizados se conservan. Recarga con Ctrl+Shift+R y comprueba v1.4 en el pie.
-
-## Etiquetas adaptables (v1.4.1)
-
-Los bloques muestran «Compás 1–5» por defecto y cambian a «cc. 1–5» solo cuando el texto completo no cabe. La barra HTML mide el texto con la fuente real y recalcula al redimensionar los bloques; el canvas del video aplica el mismo criterio según el ancho disponible. Una sección de un solo compás muestra «Compás 6». Recarga con Ctrl+Shift+R para actualizar la caché.
-
-## Restablecer velocidad (v1.4.2)
-
-El botón «↺ 100%» junto al deslizador restablece tanto el valor mostrado como la velocidad del reloj. Si está reproduciendo, continúa desde la posición musical actual sin repetir la cuenta previa; si está pausado, se mantiene pausado. El botón separado de bucle conserva su función de repetir compases. El restablecimiento de velocidad se desactiva durante la grabación y cuando hay audio externo, igual que el deslizador.
-
-## Timbres de Compás (v1.5)
-
-Se reutilizan **exactamente** el banco `samples.js` y el motor `sampler.js` integrados en `Compas.html`, copiados a `dist/vendor/compas-samples.js` y `compas-sampler.js`. Contienen 52 WAV mono PCM y siete familias: campanas (metalófono), guitarra acústica, guitarra eléctrica limpia, bajo eléctrico, teclado/sintetizador, coro/guía de voz y batería acústica GM. Los dos teclados comparten la familia de Compás; la voz es un coro sin letra. Se conserva el mapeo por región, afinación, bucles de sustain, envolventes y apagado entre hi-hats. La mezcla general puede diferir según volúmenes y limitador.
-
-`sample-player.js` conecta ese reproductor a los buses y al reloj existentes de Metalófono Aula, para que tanto el tutorial como las otras partes y el video usen estas muestras. Los WAV/MP3 cargados por el docente siguen sustituyendo a su pista. Solo el metrónomo utiliza osciladores. No se descarga ningún recurso de un tercero: el banco está incluido en la aplicación y su caché offline. La primera carga incorpora aproximadamente 10,7 MB de JavaScript con las muestras; se decodifican una sola vez por contexto de audio.
-
-Muestras melódicas: MS Basic / MuseScore General (MIT; avisos completos en `dist/licenses/MS-Basic-MIT.md`). Batería: Big Rusty Drums, Karoryfer (CC0; `dist/licenses/Big-Rusty-Drums-CC0.txt`). El código original del proyecto sigue bajo MIT.
-
-Verificación: 22 pruebas automáticas, incluyendo decodificación y amplitud de las 52 muestras, selección de las nueve partes, cinco sonidos distintos de batería, conexión al mezclador, exclusión de la melodía y sustitución por audio externo. La regresión local de Everybody verifica una región disponible para cada altura sonora. La escucha perceptual y el video requieren navegador normal; el entorno de desarrollo mantiene la limitación ya indicada. Recarga con Ctrl+Shift+R y comprueba v1.5.
-
-## Colores del instrumento y tema claro (v1.6)
-
-Paleta suave corregida para todas las octavas: Do azul, Re verde, Mi amarillo, Fa naranjo, Sol rojo, La morado y Si celeste. Las cinco alturas alteradas (sostenidos/bemoles) usan un mismo azul más claro que Do y distinto del celeste de Si. La cascada usa los mismos colores. En el editor, modificar una alteración actualiza las cinco para conservar ese criterio. El esquema monocromo sigue disponible.
-
-Se retiró la opción de tema oscuro y sus estilos, también del canvas y del video. Las preferencias oscuras antiguas ya no se leen. Para que una paleta guardada anterior no anule esta corrección, los nuevos colores se guardan con una nueva clave de paleta; la primera carga de v1.6 aplica estos valores. Recarga con Ctrl+Shift+R y comprueba v1.6.
-
-## Publicación estática sin consulta de metadatos
-
-El flujo de Pages sube directamente `dist/` y despliega el artefacto. No usa `actions/configure-pages`, porque no necesita reconfigurar un generador ni consultar su URL base. El sitio debe habilitarse previamente en Settings → Pages → GitHub Actions. El trabajo de despliegue declara `contents: read`, `pages: write` e `id-token: write`. No requiere tokens personales guardados como secretos.
-
-## Metalófono claro y volumen independiente (v1.7)
-
-El tutorial usa por defecto un sonido claro con fundamental calculada desde MIDI, La4 = 440 Hz, decaimiento de 0,8 segundos y un tercer armónico suave. «Sonido, apariencia y anticipación → Sonido del metalófono» permite volver a las campanas originales de Compás. El resto del acompañamiento sigue usando sus muestras de Compás. Esto no cambia las notas del archivo, la elección escrita/sonora ni la transposición.
-
-Se comprobó el espectro de las muestras originales que cubren MIDI 55–79: la fundamental está aproximadamente a +0,9 cents del temperamento estándar, pero sus parciales inarmónicos dominantes están por encima de esa fundamental (hasta 5,5 dB en la muestra más grave). Por tanto, esta medición no demuestra una desafinación de semitonos: el cambio de timbre/octava requiere confirmación perceptual en navegador. La alternativa clara deja una referencia de altura inequívoca sin alterar las demás pistas.
-
-El volumen del metalófono está disponible en el transporte, incluso en pantalla limpia, en el panel de audio y en su fila del mezclador. Los tres controles se sincronizan, permiten 0–200% y modifican el bus inmediatamente, también para notas que ya suenan. La amplificación se aplica igualmente a la captura de video; el limitador general puede comprimir mezclas fuertes. Recarga con Ctrl+Shift+R y comprueba v1.7.
-
-## Corrección del parcial dominante de campanas (v1.7.1)
-
-El compás 6 de `everybodyV2.mxl` comienza con Do♯5 (MIDI 73, 554,365 Hz) y Si4 (MIDI 71, 493,883 Hz). La lectura y el cálculo de altura son correctos. En la muestra `bells/72.wav`, sin embargo, el pico dominante está cerca de 5,3 veces la fundamental: al tocar esas notas domina aproximadamente Fa♯7 (2942 Hz) y Mi7 (2621 Hz). Comprobar solo la existencia de la fundamental, como en la primera revisión, no detectaba este problema perceptual.
-
-El adaptador ahora pasa las campanas por dos filtros lowpass Q=1/√2, con corte en dos veces la frecuencia de la nota. Esto atenúa el parcial inarmónico y conserva la altura original del MIDI; no transpone la melodía. La copia del banco de Compás permanece intacta. Se aplica a las campanas, tanto del tutorial como del acompañamiento, mientras las otras familias conservan su ruta de audio. Los filtros se desconectan cuando termina cada fuente. El sonido claro sigue disponible como referencia.
-
-`python3 scripts/debug-bell-pitch.py` (requiere numpy y scipy solo para este diagnóstico) compara el espectro de las 25 láminas antes y después de esos mismos filtros. Tras filtrar, el pico dominante coincide con la fundamental en las 25 notas, con error medido menor a un cent. Para las notas concretas: Do♯5 pasa de un pico dominante de 2942,068 Hz a 554,656 Hz; Si4 de 2621,084 Hz a 494,143 Hz. La pequeña desviación de aproximadamente +0,9 cents procede de la muestra original, no equivale a un semitono. La prueba de regresión del MXL verifica MIDI 73 y 71 en el compás 6. La página `/diagnostico.html` permite escuchar esas dos campanas corregidas sin acompañamiento. Hay 24 pruebas automáticas de Node; la escucha real sigue requiriendo un navegador normal.
-
-Recarga con Ctrl+Shift+R tras publicar y comprueba v1.7.1. El volumen independiente 0–200% de v1.7 se mantiene.
-
-## Misma altura sonora que Compás (v1.8)
-
-La comparación con el `Compas.html` del proyecto de referencia muestra una diferencia decisiva: sus primeros ataques de glockenspiel son MIDI **97 y 95**, respetando la transposición +24 del MXL. Metalófono Aula mostraba correctamente MIDI **73 y 71**, pero también enviaba esos valores al sampler. Por ello elegía `bells/72.wav`, cuyo parcial dominante se percibía como Fa♯/Mi. Compás elige `bells/96.wav` para esas dos notas, donde la fundamental domina. La revisión anterior de los parciales describía el problema de la muestra grave, pero faltaba comparar esta diferencia en la altura sonora.
-
-El modelo ahora separa `midi` (lámina que se ilumina) y `soundMidi` (altura sonora original más los ajustes docentes). Por defecto el tutorial usa el timbre original de Compás y la opción «Altura del sonido: Como la partitura»: en Everybody se iluminan Do♯5 y Si4 y suena el glockenspiel dos octavas más arriba, igual que Compás. Esto conserva la clase de nota, sin convertir Sol en Do ni Do♯ en Fa♯.
-
-«Como la lámina escolar» permite que el sonido coincida con el MIDI rotulado de cada lámina; en ese modo se define la fundamental de las campanas con los filtros de v1.7.1. En el modo predeterminado, el sampler reproduce las muestras originales sin ese filtrado. El sonido claro sigue disponible. Tanto los ataques de la partitura como los clics sobre las láminas respetan esta elección.
-
-Verificación: 25 pruebas automáticas, regresión de Everybody con los pares visual/sonoro `[73,97]` y `[71,95]`, y comprobación de que se selecciona `bells/96.wav`, como en Compás. En `/diagnostico.html` se puede escuchar la secuencia aislada. El volumen independiente 0–200% se mantiene. Recarga con Ctrl+Shift+R tras publicar y comprueba v1.8.
-
-## Piano de cuatro octavas (v1.9)
-
-En «Instrumento del tutorial» puedes elegir Metalófono o **Piano · 4 octavas**. Se reconocen nombres de piano/teclado/sintetizador/órgano y familias General MIDI de teclados. Si hay varios, todos aparecen en el grupo de partes detectadas y puedes elegir Teclado 1, Teclado 2, etc. Los nombres repetidos se numeran. Otras partes siguen disponibles para selección manual. Si un archivo solo tiene teclados reconocidos, se abre directamente la vista de piano; si tiene metalófono, este conserva la prioridad inicial.
-
-El piano tiene **49 teclas de Do2 a Do6**, cuatro octavas incluyendo ambos Do extremos. Son 29 blancas y 20 negras, con los nombres visibles y contraste claro en las alteraciones. No usa la paleta de colores de notas del metalófono; esos controles se ocultan en piano. El rango inicial MIDI 36 es editable y su extremo superior siempre está 48 semitonos por encima. La elección C3/C4 para Do central solo cambia los rótulos. La misma paleta de estructura y el resto de la interfaz se mantienen.
-
-En vez de baquetas, una estela corta y un punto anticipan cada ataque. Las teclas se resaltan durante toda la duración de las notas. Se conservan **todos los acordes**, sin aplicar la reducción a una voz o dos baquetas del metalófono. El audio usa la familia de teclado de Compás y sus bucles de sustain, con duración convertida a segundos por el reloj, respetando cambios de tempo. Al saltar o reanudar en medio de una nota sostenida se reconstruye el acorde restante. La pista del tutorial se excluye del acompañamiento para evitar duplicación.
-
-Puedes alternar entre instrumentos: cada vista recuerda su rango y ajustes durante la sesión y permite elegir entre sus partes detectadas. Al cambiar de vista o parte, la reproducción se detiene y vuelve al inicio. Conserva los controles de estructura, bucle, tempo, transposición, volumen independiente, pantalla limpia y exportación del canvas con audio. Pulsar una tecla negra prioriza su superficie superpuesta sobre la blanca subyacente.
-
-Verificación: 32 pruebas automáticas, incluyendo detección de múltiples teclados, 49 alturas y geometría, acordes completos, teclas superpuestas, duración del audio, reanudación de sostenidos y renderer con estelas sin baquetas. La regresión de Everybody detecta ambos teclados y comprueba que sus 234 y 406 ataques caben en el rango inicial sin omitir voces ni duplicar el acompañamiento. La comprobación visual y la escucha en un navegador normal siguen sujetas a la limitación del entorno descrita anteriormente. Recarga con Ctrl+Shift+R y comprueba v1.9.
-
-## Resaltado celeste del piano (v1.9.1)
-
-Las teclas del piano permanecen blancas y negras en reposo y se pintan de celeste mientras su nota suena, incluidos todos los sonidos de un acorde. El resaltado dura lo mismo que la nota y desaparece al soltarla. La estela anticipatoria y el contorno activo también usan celeste/azul, coordinados con la página. Las etiquetas de las teclas negras pasan a texto oscuro al activarse para conservar el contraste sobre el celeste. Referencia visual: [MIDIano](https://github.com/Bewelge/MIDIano); implementación propia en el canvas existente. Recarga con Ctrl+Shift+R después de publicar.
+Las novedades se acumulan en `CHANGELOG.md` sin borrar las versiones anteriores. Cada release usa una etiqueta `vX.Y.Z` asociada a un commit y un paquete descargable de `dist/`. `package.json` identifica la versión actual; GitHub conserva las releases y sus notas. Las mejoras compatibles incrementan la versión menor y las correcciones incrementan el parche.

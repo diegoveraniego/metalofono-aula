@@ -52,7 +52,7 @@ export function parseXML(source){
   const drumMap=new Map(definition?children(definition,'midi-instrument').filter(i=>child(i,'midi-unpitched')).map(i=>[i.getAttribute('id'),num(i,'midi-unpitched')-1]):[]);
   const drumInstruments=[...drumMap].map(([id,midi])=>({id,midi,xmlMidi:midi+1,name:children(definition,'score-instrument').find(i=>i.getAttribute('id')===id)?.querySelector('instrument-name')?.textContent??id}));
   const percussion=drumMap.size>0;const program=instrument?num(instrument,'midi-program',1)-1:0;
-  let divisions=1,beats=4,unit=4,start=0,transpose=0,tuning=[];const notes=[],clefs=[],lyrics=[],harmonies=[],measures=[],tempos=[],meters=[],ties=new Map();
+  let divisions=1,beats=4,unit=4,start=0,transpose=0,tuning=[];const notes=[],notation=[],keys=[],clefs=[],lyrics=[],harmonies=[],measures=[],tempos=[],meters=[],ties=new Map();
   children(part,'measure').forEach((measure,mi)=>{
    for(const mark of measure.getElementsByTagName('rehearsal'))if(mark.textContent.trim())structureMarks.push({name:mark.textContent.trim(),startMeasure:mi+1});
    let cursor=0,lastStart=0,extent=0;
@@ -61,6 +61,7 @@ export function parseXML(source){
     if(tag==='attributes'){
      divisions=num(el,'divisions',divisions);if(divisions<=0)throw Error('Divisiones MusicXML inválidas.');
      const time=child(el,'time');if(time){beats=val(time,'beats','4').split('+').reduce((s,n)=>s+Number(n),0);unit=num(time,'beat-type',4);meters.push({start,numerator:beats,denominator:unit});}
+     for(const key of children(el,'key'))keys.push({start:start+cursor,staff:Number(key.getAttribute('number')||0),fifths:num(key,'fifths'),mode:val(key,'mode','major')});
      const tr=child(el,'transpose');if(tr)transpose=num(tr,'chromatic')+12*num(tr,'octave-change');
      for(const clef of children(el,'clef'))clefs.push({start:start+cursor,staff:Number(clef.getAttribute('number')||1),sign:val(clef,'sign'),line:num(clef,'line'),octaveChange:num(clef,'clef-octave-change')});
      const staff=children(el,'staff-details').find(s=>children(s,'staff-tuning').length);if(staff)tuning=children(staff,'staff-tuning').sort((a,b)=>Number(b.getAttribute('line'))-Number(a.getAttribute('line'))).map(t=>12*(num(t,'tuning-octave')+1)+({C:0,D:2,E:4,F:5,G:7,A:9,B:11}[val(t,'tuning-step')])+num(t,'tuning-alter'));
@@ -76,15 +77,20 @@ export function parseXML(source){
     if(tag==='forward'){cursor+=num(el,'duration')/divisions;extent=Math.max(extent,cursor);}
     if(tag==='note'){
      if(child(el,'grace')){warnings.push('Las notas de adorno se omiten.');continue;}
+     const fermata=el.querySelector('fermata');
      const duration=num(el,'duration')/divisions,chord=!!child(el,'chord'),at=chord?lastStart:cursor,pitch=child(el,'pitch'),voice=val(el,'voice','1');
+     if((pitch||child(el,'rest'))&&el.getAttribute('print-object')!=='no'){
+      const tied=el.querySelector('notations');
+      notation.push({start:start+at,duration,measure:mi+1,staff:num(el,'staff',1),voice,rest:!!child(el,'rest'),wholeRest:child(el,'rest')?.getAttribute('measure')==='yes',step:pitch?val(pitch,'step'):null,octave:pitch?num(pitch,'octave'):null,alter:pitch?num(pitch,'alter'):0,type:val(el,'type'),dots:children(el,'dot').length,stem:val(el,'stem'),accidental:val(el,'accidental'),ties:[...new Set([...children(el,'tie'),...(tied?children(tied,'tied'):[])].map(t=>t.getAttribute('type')))],tupletStart:tied?children(tied,'tuplet').some(t=>t.getAttribute('type')==='start'):false,tuplet:child(el,'time-modification')?num(child(el,'time-modification'),'actual-notes'):null});
+     }
      if(pitch){
       for(const l of children(el,'lyric')){const texts=children(l,'text').map(t=>t.textContent).join(' ');if(texts)lyrics.push({start:start+at,duration,text:texts,syllabic:val(l,'syllabic','single'),verse:l.getAttribute('number')||'1',extend:!!child(l,'extend'),lineBreakAfter:!!child(l,'end-line')});}
       const pc={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[val(pitch,'step')],alter=num(pitch,'alter'),midi=12*(num(pitch,'octave')+1)+pc+alter+transpose;
       if(!Number.isInteger(midi)||midi<0||midi>127)throw Error('Altura no compatible (microtonos o nota MIDI inválida).');
       const key=voice+':'+val(el,'staff','1')+':'+midi,types=children(el,'tie').map(t=>t.getAttribute('type'));
       const old=ties.get(key);
-      if(types.includes('stop')&&old&&Math.abs(old.start+old.duration-(start+at))<1e-5){old.duration+=duration;for(const l of lyrics){if(l.start<start+at&&Math.abs(l.start+l.duration-(start+at))<1e-5&&!lyrics.some(next=>next.verse===l.verse&&Math.abs(next.start-(start+at))<1e-5))l.duration+=duration;}if(!types.includes('start'))ties.delete(key);}
-      else {const n={id:`p${pi}n${notes.length}`,midi,writtenMidi:midi-transpose,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,staff:num(el,'staff',1),voice,velocity:.75};const technical=el.querySelector('technical');const slide=el.querySelector('slide');if(slide)n.slide=slide.getAttribute('type');if(technical){n.string=num(technical,'string');n.fret=num(technical,'fret',-1);}notes.push(n);if(types.includes('start'))ties.set(key,n);}
+      if(types.includes('stop')&&old&&Math.abs(old.start+old.duration-(start+at))<1e-5){old.duration+=duration;if(fermata)(old.fermatas??=[]).push({start:start+at,duration,type:fermata.getAttribute('type')||'upright'});for(const l of lyrics){if(l.start<start+at&&Math.abs(l.start+l.duration-(start+at))<1e-5&&!lyrics.some(next=>next.verse===l.verse&&Math.abs(next.start-(start+at))<1e-5))l.duration+=duration;}if(!types.includes('start'))ties.delete(key);}
+      else {const n={id:`p${pi}n${notes.length}`,midi,writtenMidi:midi-transpose,start:start+at,duration,measure:mi+1,beat:at/(4/unit)+1,staff:num(el,'staff',1),voice,velocity:.75};if(fermata)n.fermatas=[{start:start+at,duration,type:fermata.getAttribute('type')||'upright'}];const technical=el.querySelector('technical');const slide=el.querySelector('slide');if(slide)n.slide=slide.getAttribute('type');if(technical){n.string=num(technical,'string');n.fret=num(technical,'fret',-1);}notes.push(n);if(types.includes('start'))ties.set(key,n);}
      }else if(child(el,'unpitched')){
       const drumId=child(el,'instrument')?.getAttribute('id'),midi=drumMap.get(drumId)??(drumMap.size===1?[...drumMap.values()][0]:null);
       const unpitched=child(el,'unpitched'),info=drumInstruments.find(i=>i.id===drumId);
@@ -100,11 +106,11 @@ export function parseXML(source){
   });
   clefs.sort((a,b)=>a.start-b.start);for(const n of notes){const clef=clefs.findLast(c=>c.staff===(n.staff??1)&&c.start<=n.start);if(clef){n.clef=clef.sign;n.clefLine=clef.line;}}
   sharedTempos.push(...tempos);
-  return {id,name:(definition?val(definition,'part-name','Parte '+(pi+1)):'Parte '+(pi+1)).trim(),program,percussion,clefs,tuning:tuning.map(m=>m+transpose),drumInstruments,lyrics:lyrics.sort((a,b)=>a.start-b.start),harmonies:harmonies.sort((a,b)=>a.start-b.start),notes:notes.sort((a,b)=>a.start-b.start),measures,tempos,meters:meters.length?meters:[{start:0,numerator:4,denominator:4}]};
+  return {id,sourceTrack:pi,name:(definition?val(definition,'part-name','Parte '+(pi+1)):'Parte '+(pi+1)).trim(),program,percussion,notation,keys,clefs,tuning:tuning.map(m=>m+transpose),drumInstruments,lyrics:lyrics.sort((a,b)=>a.start-b.start),harmonies:harmonies.sort((a,b)=>a.start-b.start),notes:notes.sort((a,b)=>a.start-b.start),measures,tempos,meters:meters.length?meters:[{start:0,numerator:4,denominator:4}]};
  });
  const tempoMap=[...new Map(sharedTempos.sort((a,b)=>a.start-b.start).map(t=>[t.start,t])).values()];if(!tempoMap.some(t=>t.start===0))tempoMap.unshift({start:0,bpm:120});for(const p of parts)p.tempos=tempoMap;
  if(!parts.some(p=>p.notes.length))throw Error('La partitura no contiene notas con altura.');
- return {version:1,title:doc.querySelector('work-title, movement-title')?.textContent||'Partitura sin título',parts,structureMarks:[...new Map(structureMarks.map(m=>[m.startMeasure,m])).values()].sort((a,b)=>a.startMeasure-b.startMeasure),warnings:[...new Set(warnings)]};
+ return {version:1,musicXml:{xml:source},title:doc.querySelector('work-title, movement-title')?.textContent||'Partitura sin título',parts,structureMarks:[...new Map(structureMarks.map(m=>[m.startMeasure,m])).values()].sort((a,b)=>a.startMeasure-b.startMeasure),warnings:[...new Set(warnings)]};
 }
 export function parseMIDI(buffer){
  const v=new DataView(buffer);let p=0;const u8=()=>{if(p>=v.byteLength)throw Error('MIDI incompleto.');return v.getUint8(p++);},u16=()=>u8()*256+u8(),u32=()=>u16()*65536+u16(),str=n=>String.fromCharCode(...Array.from({length:n},u8));

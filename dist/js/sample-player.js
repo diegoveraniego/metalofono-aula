@@ -1,5 +1,6 @@
 // Banco y sampler idénticos a Compas.html, distribuidos junto a la app para uso offline.
 import '../vendor/compas-samples.js';
+import '../vendor/keyboard-samples.js';
 import '../vendor/compas-sampler.js';
 export const sampler=globalThis.CompasSampler;
 export const sampleBank=globalThis.CompasSamples;

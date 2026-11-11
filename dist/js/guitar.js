@@ -19,6 +19,7 @@ export function guitarHarmonies(parts,selected){
  for(const h of own)byTime.set(h.start,{...h,shared:false});
  return [...byTime.values()].sort((a,b)=>a.start-b.start);
 }
+export function harmonyLabel(harmony){return harmony?.kind==='power'?harmony.label.replace(/5(?=\/|$)/,''):harmony?.label??'';}
 export function harmonyAt(part,beat){return (part.harmonies??[]).findLast(h=>h.start<=beat)??null;}
 export function harmonyDiagram(harmony){return (harmony?.frame?.notes??[]).filter(n=>n.string>=1&&n.string<=6&&Number.isInteger(n.fret)&&n.fret>=0).map(n=>({...n,proposed:false}));}
 export function drawGuitar(c,beat,notes,part,opts={}){
@@ -28,7 +29,7 @@ export function drawGuitar(c,beat,notes,part,opts={}){
  c.fillStyle=t.soft;c.fillRect(left,top-22,right-left,step*5+44);
  for(let s=0;s<6;s++){const y=top+s*step;c.fillStyle=t.ink;c.textAlign='left';c.font='600 19px system-ui';c.fillText(STRING_NAMES[s],65,y+6);c.strokeStyle=stringColors[s];c.lineWidth=1.5+s*.45;c.beginPath();c.moveTo(left,y);c.lineTo(right,y);c.stroke();}
  c.textAlign='center';c.font='bold 24px system-ui';c.fillStyle=t.accent;
- for(const h of part.harmonies??[]){if(h.start<beat||h.start>beat+horizon)continue;const x=hit+(h.start-beat)/horizon*(right-hit);c.fillText(h.label,x,top-30);}
+ for(const h of part.harmonies??[]){if(h.start<beat||h.start>beat+horizon)continue;const x=hit+(h.start-beat)/horizon*(right-hit);c.fillText(harmonyLabel(h),x,top-30);}
  c.save();c.beginPath();c.rect(left,top-23,right-left,step*5+46);c.clip();
  for(const m of part.measures){const delta=m.start-beat;if(delta<0||delta>horizon)continue;const x=hit+delta/horizon*(right-hit);c.strokeStyle=t.line;c.lineWidth=1;c.beginPath();c.moveTo(x,top-22);c.lineTo(x,top+step*5+22);c.stroke();}
  const xFor=t=>hit+(t-beat)/horizon*(right-hit);
@@ -40,7 +41,7 @@ export function drawGuitar(c,beat,notes,part,opts={}){
  c.restore();c.strokeStyle=t.accent;c.lineWidth=4;c.beginPath();c.moveTo(hit,top-27);c.lineTo(hit,top+step*5+27);c.stroke();c.fillStyle=t.accent;c.textAlign='center';c.font='bold 16px system-ui';c.fillText('TOCA AQUÍ',hit,top+step*5+53);
  const current=notes.filter(n=>n.string&&n.start<=beat+.025&&n.start+n.duration>beat);let upcoming=notes.find(n=>n.string&&n.start>beat);const soundingGroup=current.length?current:upcoming?notes.filter(n=>n.string&&Math.abs(n.start-upcoming.start)<.001):[];
  const harmony=harmonyAt(part,beat),diagram=harmonyDiagram(harmony),group=diagram.length?diagram:soundingGroup;
- c.textAlign='left';c.font='600 18px system-ui';c.fillStyle=t.ink;c.fillText(harmony?'ACORDE · '+harmony.label:group.length>1?(current.length?'ACORDE AHORA':'PRÓXIMO ACORDE'):(current.length?'AHORA':'PREPARA'),65,568);
+ c.textAlign='left';c.font='600 18px system-ui';c.fillStyle=t.ink;c.fillText(harmony?'ACORDE · '+harmonyLabel(harmony):group.length>1?(current.length?'ACORDE AHORA':'PRÓXIMO ACORDE'):(current.length?'AHORA':'PREPARA'),65,568);
  // Misma orientación que la tablatura: 1.ª arriba, 6.ª abajo; trastes hacia la derecha.
  const gx=151,gy=598,width=174,stringStep=18,fretted=group.filter(n=>n.fret>0),base=Math.max(1,Math.min(...fretted.map(n=>n.fret),1e3));
  const first=harmony?.frame?.firstFret??(base===1e3?1:base),frets=Math.max(4,...fretted.map(n=>n.fret-first+1)),fretWidth=width/frets;

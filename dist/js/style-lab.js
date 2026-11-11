@@ -1,9 +1,11 @@
 import {THEMES,FONTS,DEFAULT_APPEARANCE,normalizeAppearance,applyMenuAppearance,visualTheme} from './appearance.js';
 import {download} from './structure.js';
+let customFontAsset=null;
+export function getCustomFontAsset(){return customFontAsset;}
 const STORAGE='adaptaciones.appearance.v1';
 export function setupStyleLab({renderer,isRecording,onChange,notify}){
  const $=id=>document.getElementById(id);let settings={...DEFAULT_APPEARANCE},customFace=null;
- try{const saved=localStorage.getItem(STORAGE);if(saved)settings=normalizeAppearance(JSON.parse(saved));}catch{}
+ try{const saved=localStorage.getItem(STORAGE);if(saved)settings=normalizeAppearance(JSON.parse(saved));if(settings.font==='system')settings.font='inter';}catch{}
  const option=(value,label)=>{const el=document.createElement('option');el.value=value;el.textContent=label;return el;};
  for(const id of ['styleMenuPalette','styleVideoPalette'])$(id).replaceChildren(...(id==='styleVideoPalette'?[option('same','Igual que el menú')]:[]),...Object.values(THEMES).map(t=>option(t.id,t.name)));
  $('styleFont').replaceChildren(...Object.entries(FONTS).map(([key,font])=>option(key,font.name)));
@@ -19,7 +21,7 @@ export function setupStyleLab({renderer,isRecording,onChange,notify}){
  $('openStyleLab').onclick=()=>{if(isRecording())return;if($('styleLab').open)$('styleLab').close();else{$('styleLab').show();$('styleMenuPalette').focus();}};
  $('styleLoadFont').onclick=()=>$('styleFontFile').click();$('styleFontFile').onchange=async()=>{
   const file=$('styleFontFile').files[0];if(!file||isRecording())return;
-  try{if(file.size>10*1024*1024)throw Error('La fuente supera 10 MB.');const face=new FontFace('AulaPersonalizada',await file.arrayBuffer());await face.load();if(isRecording())return;if(customFace)document.fonts.delete(customFace);document.fonts.add(face);customFace=face;FONTS.custom={name:'Archivo: '+file.name,family:'"AulaPersonalizada", sans-serif'};const existing=$('styleFont').querySelector('option[value="custom"]');if(existing)existing.remove();$('styleFont').append(option('custom',FONTS.custom.name));settings.font='custom';apply();notify('Fuente local aplicada.');}catch(error){notify('No se pudo cargar la fuente: '+error.message);}finally{$('styleFontFile').value='';}
+  try{if(file.size>10*1024*1024)throw Error('La fuente supera 10 MB.');const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let offset=0;offset<bytes.length;offset+=16384)binary+=String.fromCharCode(...bytes.subarray(offset,offset+16384));const asset={name:file.name,base64:btoa(binary)};const face=new FontFace('AulaPersonalizada',bytes);await face.load();if(isRecording())return;if(customFace)document.fonts.delete(customFace);document.fonts.add(face);customFace=face;customFontAsset=asset;FONTS.custom={name:'Archivo: '+file.name,family:'"AulaPersonalizada", sans-serif'};const existing=$('styleFont').querySelector('option[value="custom"]');if(existing)existing.remove();$('styleFont').append(option('custom',FONTS.custom.name));settings.font='custom';apply();notify('Fuente local aplicada.');}catch(error){notify('No se pudo cargar la fuente: '+error.message);}finally{$('styleFontFile').value='';}
  };
  $('styleReset').onclick=()=>{if(isRecording())return;settings={...DEFAULT_APPEARANCE};apply();};
  $('styleExport').onclick=()=>download(new Blob([JSON.stringify({version:1,appearance:settings},null,2)],{type:'application/json'}),'adaptaciones-aula-estilo.json');

@@ -4,6 +4,16 @@
 `Part = {id, name, program?, percussion?, notes:Note[], measures:Measure[], tempos:Tempo[], meters:Meter[]}`.
 `Note = {id, midi, writtenMidi?, drum?, start, duration, measure, beat, voice, velocity}`.
 
+`Part.notation?` conserva los eventos escritos MusicXML antes de unir ligaduras:
+`{start,duration,measure,staff,voice,rest,wholeRest,step,octave,alter,type,dots,stem,accidental,ties,tuplet,tupletStart}`.
+`Part.keys? = {start,staff,fifths,mode}[]`, donde `staff:0` aplica a todos los
+pentagramas. Las claves permanecen en `Part.clefs`. No se cambian estos datos al
+preferir sostenidos/bemoles o transponer el tutorial. `Renderer.opts.showPianoScore`
+habilita la franja de notación y `noteSpelling = auto|sharps|flats` controla la
+preferencia de escritura; `Section.spelling? = auto|sharps|flats` sobrescribe el
+ajuste general en sus límites inclusivos. Ausente equivale a heredar. El JSON
+versión 1 conserva la propiedad opcional sin romper estructuras anteriores.
+
 - MIDI es entero 0–127, sin transposición de interfaz; `midi` conserva altura sonora y `writtenMidi` la escrita cuando el origen es MusicXML. El tutorial elige escritas por defecto, mientras el acompañamiento usa `midi`. Inicio y duración se expresan en negras (quarter-note beats), nunca en segundos. Inicio desde cero; compás y pulso desde uno; pulso relativo a la unidad del denominador del compás. MIDI 60 es Do central, independientemente de cómo se rotule su octava.
 - `Measure = {number,start,duration,numerator,denominator}`. Numeración de navegación consecutiva desde 1, incluso anacrusas. Una anacrusa conserva su duración real.
 - `Tempo = {start,bpm}` en negras/minuto. `Meter = {start,numerator,denominator}`. Cambios de tempo y compás se conservan y se aplican salvo que el docente active el BPM/compás manual.

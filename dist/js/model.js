@@ -1,7 +1,9 @@
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const LATIN=['Do','Do♯','Re','Re♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si'];
 export const ENGLISH=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
-export function noteName(midi,latin=true,middle=4){return (latin?LATIN:ENGLISH)[((midi%12)+12)%12]+(Math.floor(midi/12)-1+(middle-4));}
+export const LATIN_FLAT=['Do','Re♭','Re','Mi♭','Mi','Fa','Sol♭','Sol','La♭','La','Si♭','Si'];
+export const ENGLISH_FLAT=['C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B'];
+export function noteName(midi,latin=true,middle=4,spelling='sharps'){return (spelling==='flats'?(latin?LATIN_FLAT:ENGLISH_FLAT):(latin?LATIN:ENGLISH))[((midi%12)+12)%12]+(Math.floor(midi/12)-1+(middle-4));}
 export function transformed(part,octave=0,semitones=0,mode='upper',pitchSource='written'){
  const groups=new Map();for(const n of part.notes){const key=Math.round(n.start*1e6);if(!groups.has(key))groups.set(key,[]);groups.get(key).push({...n,soundMidi:n.midi+12*octave+semitones,midi:(pitchSource==='written'?(n.writtenMidi??n.midi):n.midi)+12*octave+semitones});}
  let hand=0;return [...groups.values()].flatMap(g=>{g.sort((a,b)=>a.midi-b.midi);const chosen=mode==='all'?g:mode==='upper'?[g.at(-1)]:g.length>1?[g[0],g.at(-1)]:g;return chosen.map((n,i)=>({...n,hand:mode==='upper'?0:chosen.length===2?i:hand++%2}));}).sort((a,b)=>a.start-b.start||a.midi-b.midi);

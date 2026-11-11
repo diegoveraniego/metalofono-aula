@@ -2,7 +2,7 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {THEMES,FONTS,DEFAULT_APPEARANCE,normalizeAppearance,visualTheme,canvasFont,styledContext,applyMenuAppearance,musicalPalette,sectionFillColor,themedSections} from '../dist/js/appearance.js';
 import {Renderer,PALETTE,PIANO_CLEF_COLORS,cascadeColor} from '../dist/js/renderer.js';import {prepareTutorial} from '../dist/js/tutorials.js';import {drawVideoIntro} from '../dist/js/video-intro.js';
 test('presets validan paletas, fuentes y tamaño al cargar JSON sin aceptar valores CSS arbitrarios',()=>{
- const settings=normalizeAppearance({menu:'__proto__',video:'url(secret)',font:'constructor',borders:'anything',textSize:999,applyVideo:false});assert.equal(settings.menu,'aula');assert.equal(settings.video,'same');assert.equal(settings.font,'system');assert.equal(settings.borders,'soft');assert.equal(settings.textSize,130);assert.equal(settings.applyVideo,false);assert.deepEqual(normalizeAppearance(null),DEFAULT_APPEARANCE);assert.deepEqual(normalizeAppearance(JSON.parse(JSON.stringify(DEFAULT_APPEARANCE))),DEFAULT_APPEARANCE);
+ const settings=normalizeAppearance({menu:'__proto__',video:'url(secret)',font:'constructor',borders:'anything',textSize:999,applyVideo:false});assert.equal(settings.menu,'aula');assert.equal(settings.video,'same');assert.equal(settings.font,'inter');assert.equal(settings.borders,'soft');assert.equal(settings.textSize,130);assert.equal(settings.applyVideo,false);assert.deepEqual(normalizeAppearance(null),DEFAULT_APPEARANCE);assert.deepEqual(normalizeAppearance(JSON.parse(JSON.stringify(DEFAULT_APPEARANCE))),DEFAULT_APPEARANCE);
 });
 test('menús y visualizador admiten paletas independientes y se puede preservar el video original',()=>{
  const a={...DEFAULT_APPEARANCE,menu:'nord',video:'catppuccin-latte'};assert.equal(visualTheme({appearance:a}).id,'catppuccin-latte');assert.equal(visualTheme({appearance:{...a,video:'same'}}).id,'nord');assert.equal(visualTheme({appearance:{...a,applyVideo:false}}).id,'aula');assert.equal(visualTheme({appearance:{...a,highContrast:true}}).muted,THEMES['catppuccin-latte'].ink);
@@ -35,4 +35,9 @@ test('cambiar el tema de estructuras no modifica sus colores guardados y permite
 test('ediciones musicales manuales sobreviven al guardado del preset y no se transfieren a otro tema',()=>{
  const colors=Array(12).fill('#123456'),a=normalizeAppearance({...DEFAULT_APPEARANCE,menu:'nord',noteColors:{nord:colors},sectionColors:{nord:{intro:'#abcdef'}}}),roundtrip=normalizeAppearance(JSON.parse(JSON.stringify(a)));
  assert.deepEqual(musicalPalette({appearance:roundtrip}).notes,colors);assert.equal(sectionFillColor({name:'Intro'}, {appearance:roundtrip}),'#abcdef');assert.notDeepEqual(musicalPalette({appearance:{...roundtrip,menu:'tokyo-night'}}).notes,colors);assert.deepEqual(normalizeAppearance({noteColors:{nord:['bad']},sectionColors:{nord:{intro:'url(nope)'}}}).noteColors,{});
+});
+
+test('tema Chimera conserva colores originales y los aplica también a la música',()=>{
+ const opts={appearance:{...DEFAULT_APPEARANCE,menu:'chimera'}},theme=visualTheme(opts),music=musicalPalette(opts);
+ assert.equal(theme.bg,'#000000');assert.equal(theme.accent,'#4fb6f2');assert.equal(theme.warning,'#ffb340');assert.deepEqual(music.strings,['#4fb6f2','#5be381','#ffb340','#ff73cf','#ff5d40','#eef6f8']);assert.equal(normalizeAppearance(opts.appearance).menu,'chimera');
 });
