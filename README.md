@@ -1,6 +1,6 @@
 # adaptaciones / aula
 
-**Versión actual: [v1.10.0](https://github.com/diegoveraniego/metalofono-aula/releases/tag/v1.10.0)** · [Historial de cambios](CHANGELOG.md) · [Créditos](dist/credits.html)
+**Versión actual: [v1.10.1](https://github.com/diegoveraniego/metalofono-aula/releases/tag/v1.10.1)** · [Historial de cambios](CHANGELOG.md) · [Créditos](dist/credits.html)
 
 Aplicación libre (MIT) para adaptar partituras MusicXML/MXL o MIDI a visualizaciones de metalófono, piano, guitarra, bajo, batería y voz con letra sincronizada. Parte de un kit de herramientas de código abierto para docentes y estudiantes de música. HTML, CSS y módulos JavaScript sin backend, sin cuentas, sin analítica, sin CDN y sin dependencias de instalación. Todo el procesamiento permanece en el dispositivo.
 

@@ -7,23 +7,25 @@ export function chimeraLyricEntries(part){return vocalPhrases(part.lyrics,part.n
 export function chimeraDisplayPart(part,edits={}){return {...part,lyrics:(part.lyrics??[]).map(lyric=>{const text=edits[chimeraLyricKey(lyric)];return {...lyric,text:text===undefined?lyric.text:text==='-'?'_':text,extend:true};})};}
 export function validateChimeraLyricEdits(part,edits,syllabify){
  const keys=new Set(chimeraLyricEntries(part).map(l=>l.key));
- for(const [key,text] of Object.entries(edits)){if(!keys.has(key)||typeof text!=='string'||!text.trim()||text.length>100)throw Error('Corrección de sílaba no válida.');if(text!=='-'){const syllables=syllabify(text);if(syllables.length!==1)throw Error(`«${text}» produce ${syllables.length} sílabas. Usa una sílaba por casilla, o «-» para prolongar la vocal.`);}}
+ for(const [key,text] of Object.entries(edits)){if(!keys.has(key)||typeof text!=='string'||!text.trim()||text.length>100)throw Error('Corrección de sílaba no válida.');if(text!=='-'){const syllables=text.split(/[‿_\s]+/u).filter(Boolean).flatMap(piece=>syllabify(piece));if(!syllables.length)throw Error(`No se pudo pronunciar «${text}». Escribe el texto unido en esta casilla, o «-» para prolongar la vocal.`);}}
  return edits;
 }
 export function chimeraPhrases(part,seconds,syllabify){
  const lyrics=chimeraLyricEntries(part),edits=part.chimeraLyricEdits??{},mapped=new Map();let word=[];
  validateChimeraLyricEdits(part,edits,syllabify);
+ function spoken(text){return text.split(/[‿_\s]+/u).filter(Boolean).flatMap(piece=>syllabify(piece));}
+ function packed(syllables,text){return syllables.length===1?{...syllables[0],text}:{...syllables.at(-1),text,joined:syllables.map((s,i)=>({...s,text,wordEnd:i===syllables.length-1,phraseEnd:i===syllables.length-1&&s.phraseEnd}))};}
  function finish(){
-  if(!word.length)return;const text=word.map(l=>l.text).join(''),allEdited=word.every(l=>edits[l.key]!==undefined);let syllables=allEdited?[]:syllabify(text);
-  if(!allEdited&&syllables.length>word.length){const explicit=word.map(l=>syllabify(l.text));if(explicit.every(s=>s.length===1))syllables=explicit.map(s=>s[0]);}
+  if(!word.length)return;const text=word.map(l=>l.text).join(''),allEdited=word.every(l=>edits[l.key]!==undefined);let syllables=allEdited?[]:spoken(text);
+  if(!allEdited&&syllables.length>word.length){const explicit=word.map(l=>spoken(l.text));if(explicit.every(s=>s.length>0))syllables=explicit.map((s,i)=>packed(s,word[i].text));}
   if(!allEdited&&(syllables.length===0||syllables.length>word.length))throw Error(`«${part.name}»: Chimera interpreta ${syllables.length} sílabas en «${text}», pero el MXL tiene ${word.length}. Puedes corregirlas en el editor de sílabas.`);
   let last=syllables[0];
   word.forEach((lyric,i)=>{
    const edited=edits[lyric.key];let syl;
-   if(edited==='-')syl={...(last??{nucleus:{ipa:'ɑ',stress:1},wordEnd:true,phraseEnd:false}),text:'-',onset:[],coda:[],melisma:true};
-   else if(edited!==undefined){syl={...syllabify(edited)[0],text:edited};last=syl;}
+   if(edited==='-')syl={...(last??{nucleus:{ipa:'ɑ',stress:1},wordEnd:true,phraseEnd:false}),text:'-',onset:[],coda:[],joined:undefined,melisma:true};
+   else if(edited!==undefined){syl=packed(spoken(edited),edited);last=syl;}
    else if(i<syllables.length){syl={...syllables[i],text:lyric.text};last=syl;}
-   else syl={...last,text:lyric.text,onset:[],coda:[],melisma:true};
+   else syl={...last,text:lyric.text,onset:[],coda:[],joined:undefined,melisma:true};
    mapped.set(lyric.start,syl);
   });word=[];
  }
@@ -32,9 +34,9 @@ export function chimeraPhrases(part,seconds,syllabify){
  const boundaries=[...mapped.keys()].sort((a,b)=>a-b),notes=part.notes.flatMap(note=>{const end=note.start+note.duration,cuts=[note.start,...boundaries.filter(at=>at>note.start+1e-7&&at<end-1e-7),end];return cuts.slice(0,-1).map((start,i)=>({...note,start,duration:cuts[i+1]-start}));});
  const phrases=[];let phrase,lastEnd=-Infinity,lastSyllable={text:'ah',onset:[],nucleus:{ipa:'ɑ',stress:1},coda:[],wordEnd:true,phraseEnd:false};
  for(const note of notes){if(note.start<lastEnd-1e-5)throw Error(`«${part.name}» tiene notas simultáneas. Separa cada voz para cantarla con Chimera.`);
-  const start=seconds(0,note.start),duration=seconds(note.start,note.start+note.duration),direct=mapped.get(note.start),syl=direct??{...lastSyllable,text:'-',onset:[],coda:[],melisma:true};
+  const start=seconds(0,note.start),duration=seconds(note.start,note.start+note.duration),direct=mapped.get(note.start),syl=direct??{...lastSyllable,text:'-',onset:[],coda:[],joined:undefined,melisma:true};
   if(!phrase||note.start>lastEnd+1e-5){phrase={start,notes:[]};phrases.push(phrase);if(!direct)syl.melisma=false;}
-  phrase.notes.push({midi:note.soundMidi??note.midi,beats:duration*2,syl:{...syl}});if(direct&&!direct.melisma)lastSyllable=direct;lastEnd=note.start+note.duration;
+  const articulation=syl.joined??[syl];for(const piece of articulation){const {joined,...single}=piece;phrase.notes.push({midi:note.soundMidi??note.midi,beats:duration*2/articulation.length,syl:{...single,text:syl.text}});}if(direct&&!direct.melisma)lastSyllable=direct;lastEnd=note.start+note.duration;
  }
  return phrases;
 }

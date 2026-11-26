@@ -1,5 +1,9 @@
 # Historial de cambios
 
+## v1.10.1 · 2026-11-25
+
+- Chimera acepta varias articulaciones dentro de una entrada del MXL (incluidas sinalefas), conservando la altura y duración de la nota. El editor admite palabras unidas; el parser conserva `<elision>` y distingue guiones bajos interiores de prolongaciones. La pronunciación sigue siendo inglesa.
+
 ## v1.10.0 · 2026-11-11
 
 - Tablatura de lectura para guitarra y bajo: sistemas fijos, cursor y preparación completa en segundo plano mediante alphaTab 1.8.4. Se conserva la vista de ejecución.

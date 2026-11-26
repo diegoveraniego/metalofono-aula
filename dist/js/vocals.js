@@ -15,9 +15,9 @@ export function vocalPhrases(lyrics=[],notes=[],verse){
  const selected=verse??(lyrics.some(l=>l.verse==='1')?'1':lyrics[0]?.verse??'1');
  const timeline=[];
  for(const source of lyrics.filter(l=>(l.verse??'1')===selected).toSorted((a,b)=>a.start-b.start)){
-  const text=source.text.replace(/_+/g,'').trim();
+  const text=source.text.replace(/(?<=\p{L})_+(?=\p{L})/gu,'‿').replace(/_+/g,'').trim();
   if(!text){const previous=timeline.at(-1);if(previous){previous.extend=true;previous.duration=Math.max(previous.duration,source.start+source.duration-previous.start);}continue;}
-  timeline.push({...source,text,extend:source.extend||source.text.includes('_')});
+  timeline.push({...source,text,extend:source.extend||/_+\s*$/.test(source.text)});
  }
  // Los melismas conservan la sílaba mientras cambian las notas, hasta un silencio o la siguiente sílaba.
  for(let i=0;i<timeline.length;i++){

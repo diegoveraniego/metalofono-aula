@@ -62,3 +62,15 @@ test('tumbling usa las separaciones del MXL cuando el diccionario propone una s�
  const part={name:'Voz',notes:[{midi:60,start:0,duration:1},{midi:62,start:1,duration:1}],lyrics:[{text:'tum',start:0,duration:1,syllabic:'begin'},{text:'bling',start:1,duration:1,syllabic:'end'}]},split=text=>text==='tumbling'?[syllable('tum'),syllable('bel'),syllable('ing')]:[syllable(text)];
  assert.deepEqual(chimeraPhrases(part,(a,b)=>b-a,split)[0].notes.map(n=>n.syl.text),['tum','bling']);
 });
+test('sinalefa reúne varias articulaciones en una nota sin alterar altura, duración ni el melisma siguiente',async()=>{
+ const {validateChimeraLyricEdits,chimeraLyricEntries}=await import('../dist/js/chimera-score.js');
+ const split=text=>Array.from({length:text==='haciael'?4:text==='hacia'?3:1},(_,i)=>({...syllable(text),nucleus:{ipa:['ɑ','i','ɛ','ə'][i],stress:1}}));
+ const part={name:'Voz 2',notes:[{midi:65,start:0,duration:2},{midi:67,start:2,duration:1}],lyrics:[{start:0,duration:2,text:'haciael',syllabic:'single',extend:true}]};
+ for(const text of ['haciael','hacia‿el','hacia el','hacia_el']){
+  const edits={'1:0':text};assert.doesNotThrow(()=>validateChimeraLyricEdits(part,edits,split));const notes=chimeraPhrases({...part,chimeraLyricEdits:edits},(a,b)=>(b-a)*.5,split).flatMap(p=>p.notes);assert.deepEqual(notes.slice(0,4).map(n=>n.midi),[65,65,65,65]);assert.equal(notes.slice(0,4).reduce((sum,n)=>sum+n.beats,0),2);assert.equal(notes.at(-1).midi,67);assert.ok(notes.at(-1).syl.melisma);assert.equal(notes.length,5);
+ }
+ const automatic=chimeraPhrases(part,(a,b)=>(b-a)*.5,split).flatMap(p=>p.notes);assert.equal(automatic.length,5);assert.equal(chimeraLyricEntries({...part,lyrics:[{...part.lyrics[0],text:'hacia_el'}]})[0].text,'hacia‿el');
+});
+test('MusicXML conserva elision entre textos de la misma entrada sin convertirla en melisma',async()=>{
+ useXMLTree(JSON.parse(await readFile(new URL('./fixtures/sinalefa.tree.json',import.meta.url))));const score=parseXML(await readFile(new URL('./fixtures/sinalefa.musicxml',import.meta.url),'utf8')),part=score.parts[0];assert.equal(part.lyrics[0].text,'hacia‿el');assert.equal(part.lyrics[0].elision,true);assert.equal(part.lyrics[0].duration,2);const planned=chimeraPhrases(part,(a,b)=>(b-a)*.5,t=>[syllable(t)]);assert.equal(planned[0].notes.length,3);assert.deepEqual(planned[0].notes.map(n=>n.midi),[65,65,67]);assert.equal(planned[0].notes.reduce((s,n)=>s+n.beats,0),4);
+});

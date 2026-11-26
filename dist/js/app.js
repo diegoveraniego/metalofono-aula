@@ -72,7 +72,7 @@ function renderChimeraLyricEditor(){
  for(const [index,entry] of entries.entries()){
   const bar=measureAt(voice,entry.start),label=document.createElement('label');label.className='chimera-lyric';label.title=`Compás ${bar.number} · MXL: ${entry.text}`;const number=document.createElement('span');number.textContent=`${index+1} · c.${bar.number}`;const input=document.createElement('input');input.type='text';input.maxLength=100;input.value=edits[entry.key]??entry.text;input.dataset.lyricKey=entry.key;input.dataset.original=entry.text;input.style.width=Math.max(56,Math.min(130,input.value.length*10+22))+'px';input.setAttribute('aria-label',`Sílaba ${index+1}, compás ${bar.number}, original ${entry.text}`);input.classList.toggle('edited',input.value!==entry.text);input.oninput=()=>input.classList.toggle('edited',input.value.trim()!==entry.text);label.append(number,input);$('chimeraLyricInputs').append(label);
  }
- $('chimeraLyricsInfo').textContent=`${entries.length} sílabas del MXL · las correcciones se guardan por voz y partitura.`;
+ $('chimeraLyricsInfo').textContent=`${entries.length} entradas del MXL · puedes unir palabras con ‿, un espacio o _ en una casilla; se cantan en la misma nota.`;
 }
 function saveChimeraLyricEdits(voice,edits){
  scheduler.pause();chimera.cancelPreparation();const changed=chimera.setLyricEdits(voice,edits);try{localStorage.setItem('adaptaciones.chimera.lyrics.'+scoreKey,JSON.stringify(chimera.lyricEdits));}catch{}
